@@ -1,2 +1,2 @@
 # CompraSegura
-Sistema para compra e venda segura de celulares usados.
+Sistema para compra e venda segura de celulares 
