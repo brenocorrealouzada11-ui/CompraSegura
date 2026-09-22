@@ -1,0 +1,15 @@
+.pagina-cadastro { min-height: calc(100vh - 73px); padding: 48px 20px; background: linear-gradient(135deg, #f0fdfa, #f8fafc); }
+.formulario-cartao { width: 100%; max-width: 520px; margin: 0 auto; padding: 36px; background: white; border: 1px solid #dbe5e3; border-radius: 16px; box-shadow: 0 16px 40px rgba(15,118,110,.08); }
+.formulario-cartao h1 { font-size: 32px; line-height: 1.2; margin-bottom: 16px; }
+.introducao { color: #4b5563; line-height: 1.6; margin-bottom: 28px; }
+.campo { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.campo label { font-weight: bold; }
+.campo input { min-width: 0; width: 100%; padding: 12px; border: 1px solid #9ca3af; border-radius: 8px; font: inherit; }
+.campo input[aria-invalid="true"] { border-color: #b91c1c; }
+.campo small { color: #4b5563; line-height: 1.5; }
+.erro-campo { color: #b91c1c; font-size: 14px; line-height: 1.5; }
+.aviso-erro { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-radius: 8px; padding: 14px; margin-bottom: 24px; line-height: 1.5; }
+.formulario-cartao button { width: 100%; border: 0; cursor: pointer; font: inherit; font-weight: bold; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #0f766e; outline-offset: 3px; }
+.voltar { font-size: 14px; color: #0f766e; margin-left: 16px; }
+@media (max-width: 480px) { .formulario-cartao { padding: 24px; } .pagina-cadastro { padding: 28px 16px; } .formulario-cartao h1 { font-size: 28px; } }

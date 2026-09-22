@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conta criada | CompraSegura</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastro.css}">
+</head>
+<body>
+<header class="cabecalho"><div class="container cabecalho-conteudo">
+    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
+</div></header>
+<main class="pagina-cadastro">
+    <section class="formulario-cartao" aria-labelledby="titulo">
+        <p class="etiqueta">Cadastro concluído</p>
+        <h1 id="titulo">Sua conta foi criada!</h1>
+        <p class="introducao">Seus dados foram salvos. O acesso à conta estará disponível em breve.</p>
+        <a class="botao-principal" th:href="@{/}">Voltar ao início</a>
+    </section>
+</main>
+</body>
+</html>

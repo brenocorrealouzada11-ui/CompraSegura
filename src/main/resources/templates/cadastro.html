@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar conta | CompraSegura</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastro.css}">
+</head>
+<body>
+<header class="cabecalho">
+    <div class="container cabecalho-conteudo">
+        <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
+        <a th:href="@{/}" class="voltar">Voltar ao início</a>
+    </div>
+</header>
+<main class="pagina-cadastro">
+    <section class="formulario-cartao" aria-labelledby="titulo">
+        <p class="etiqueta">Sua conta CompraSegura</p>
+        <h1 id="titulo">Crie sua conta</h1>
+        <p class="introducao">Uma só conta para comprar e anunciar aparelhos.</p>
+        <form th:action="@{/cadastro}" th:object="${cadastro}" method="post">
+            <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}">
+                <p>Confira os dados abaixo para continuar.</p>
+                <p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+            </div>
+            <div class="campo">
+                <label for="nome">Nome</label>
+                <input id="nome" type="text" th:field="*{nome}" autocomplete="name" required minlength="2" maxlength="100"
+                       aria-describedby="erro-nome" th:attr="aria-invalid=${#fields.hasErrors('nome')}">
+                <span id="erro-nome" class="erro-campo" th:errors="*{nome}"></span>
+            </div>
+            <div class="campo">
+                <label for="email">E-mail</label>
+                <input id="email" type="email" th:field="*{email}" autocomplete="email" required maxlength="254"
+                       aria-describedby="erro-email" th:attr="aria-invalid=${#fields.hasErrors('email')}">
+                <span id="erro-email" class="erro-campo" th:errors="*{email}"></span>
+            </div>
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <input id="senha" name="senha" type="password" autocomplete="new-password" required minlength="12" maxlength="128"
+                       aria-describedby="ajuda-senha erro-senha" th:attr="aria-invalid=${#fields.hasErrors('senha')}">
+                <small id="ajuda-senha">Use de 12 a 128 caracteres. Você pode usar uma frase fácil de lembrar.</small>
+                <span id="erro-senha" class="erro-campo" th:errors="*{senha}"></span>
+            </div>
+            <button class="botao-principal" type="submit">Criar minha conta</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>
