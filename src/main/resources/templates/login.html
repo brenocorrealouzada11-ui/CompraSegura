@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar | CompraSegura</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastro.css}">
+</head>
+<body>
+<header class="cabecalho"><div class="container cabecalho-conteudo">
+    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
+    <a th:href="@{/cadastro}" class="voltar">Criar conta</a>
+</div></header>
+<main class="pagina-cadastro">
+    <section class="formulario-cartao" aria-labelledby="titulo">
+        <p class="etiqueta">Sua conta CompraSegura</p>
+        <h1 id="titulo">Entre na sua conta</h1>
+        <p class="introducao">Use o e-mail e a senha que você cadastrou no site.</p>
+        <p class="aviso-erro" role="alert" th:if="${param.erro != null}">E-mail ou senha incorretos. Tente novamente.</p>
+        <p class="introducao" role="status" th:if="${param.saiu != null}">Você saiu da sua conta.</p>
+        <p class="introducao" role="status" th:if="${param.emailAlterado != null}">E-mail atualizado. Entre com seu novo e-mail.</p>
+        <p class="introducao" role="status" th:if="${param.senhaAlterada != null}">Senha alterada. Entre com sua nova senha.</p>
+        <p class="introducao" role="status" th:if="${param.atualizada != null}">Sua conta foi atualizada. Entre novamente para continuar.</p>
+        <form th:action="@{/login}" method="post">
+            <div class="campo">
+                <label for="email">E-mail</label>
+                <input id="email" name="email" type="email" autocomplete="username" required maxlength="254">
+            </div>
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <input id="senha" name="senha" type="password" autocomplete="current-password" required maxlength="128">
+            </div>
+            <button class="botao-principal" type="submit">Entrar</button>
+        </form>
+        <p class="introducao" style="margin: 24px 0 0;">Ainda não tem conta? <a th:href="@{/cadastro}" style="color: #0f766e; text-decoration: underline;">Cadastre-se</a></p>
+    </section>
+</main>
+</body>
+</html>

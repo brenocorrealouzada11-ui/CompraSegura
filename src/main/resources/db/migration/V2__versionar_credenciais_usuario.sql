@@ -1,0 +1,2 @@
+ALTER TABLE usuarios ADD COLUMN versao_credenciais BIGINT NOT NULL DEFAULT 0;
+ALTER TABLE usuarios ADD COLUMN versao_registro BIGINT NOT NULL DEFAULT 0;

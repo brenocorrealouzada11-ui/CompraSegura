@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterar senha | CompraSegura</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/css/cadastro.css}">
+</head>
+<body>
+<header class="cabecalho"><div class="container cabecalho-conteudo">
+    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
+    <a th:href="@{/minha-conta}" class="voltar">Minha conta</a>
+</div></header>
+<main class="pagina-cadastro"><section class="formulario-cartao" aria-labelledby="titulo">
+    <p class="etiqueta">Minha conta</p><h1 id="titulo">Alterar senha</h1>
+    <p class="introducao">Após salvar, entre novamente com a nova senha. As outras sessões também precisarão de um novo login.</p>
+    <form th:action="@{/minha-conta/senha}" th:object="${senha}" method="post">
+        <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}">
+            <p>Confira os dados abaixo para continuar.</p><p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+        </div>
+        <div class="campo"><label for="senhaAtual">Senha atual</label>
+            <input id="senhaAtual" name="senhaAtual" type="password" autocomplete="current-password" required maxlength="128" aria-describedby="erro-atual" th:attr="aria-invalid=${#fields.hasErrors('senhaAtual')}">
+            <span id="erro-atual" class="erro-campo" th:errors="*{senhaAtual}"></span>
+        </div>
+        <div class="campo"><label for="novaSenha">Nova senha</label>
+            <input id="novaSenha" name="novaSenha" type="password" autocomplete="new-password" required minlength="12" maxlength="128" aria-describedby="ajuda-nova erro-nova" th:attr="aria-invalid=${#fields.hasErrors('novaSenha')}">
+            <small id="ajuda-nova">Use de 12 a 128 caracteres e escolha uma senha diferente da atual.</small>
+            <span id="erro-nova" class="erro-campo" th:errors="*{novaSenha}"></span>
+        </div>
+        <div class="campo"><label for="confirmacaoSenha">Confirme a nova senha</label>
+            <input id="confirmacaoSenha" name="confirmacaoSenha" type="password" autocomplete="new-password" required minlength="12" maxlength="128" aria-describedby="erro-confirmacao" th:attr="aria-invalid=${#fields.hasErrors('confirmacaoSenha')}">
+            <span id="erro-confirmacao" class="erro-campo" th:errors="*{confirmacaoSenha}"></span>
+        </div>
+        <button class="botao-principal" type="submit">Salvar nova senha</button>
+    </form>
+    <p class="introducao" style="margin: 24px 0 0;"><a th:href="@{/minha-conta}">Cancelar</a></p>
+</section></main>
+</body></html>

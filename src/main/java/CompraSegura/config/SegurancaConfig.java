@@ -1,6 +1,9 @@
 package CompraSegura.config;
 
 import java.util.Map;
+import java.util.Locale;
+import CompraSegura.usuario.UsuarioRepository;
+import CompraSegura.usuario.UsuarioAutenticado;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,14 +12,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Configuration
 public class SegurancaConfig {
     @Bean
-    UserDetailsService userDetailsService() {
-        // Evita gerar uma conta temporaria enquanto o login nao esta implementado.
-        return new InMemoryUserDetailsManager();
+    UserDetailsService userDetailsService(UsuarioRepository usuarios) {
+        return email -> usuarios.findByEmail(email.strip().toLowerCase(Locale.ROOT))
+                .map(UsuarioAutenticado::new)
+                .orElseThrow(() -> new UsernameNotFoundException("Credenciais inválidas."));
     }
 
     @Bean
@@ -27,14 +32,22 @@ public class SegurancaConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Cadastro publico com CSRF ativo. Login sera implementado na proxima etapa.
+    SecurityFilterChain securityFilterChain(HttpSecurity http, UsuarioRepository usuarios) throws Exception {
+        // O Spring Security verifica o hash e administra a sessao, mantendo CSRF ativo.
         return http.authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/", "/index.html", "/css/**", "/cadastro", "/cadastro/sucesso", "/error").permitAll()
+                    .requestMatchers("/", "/index.html", "/css/**", "/cadastro", "/cadastro/sucesso", "/login", "/error").permitAll()
+                    .requestMatchers("/minha-conta", "/minha-conta/**").authenticated()
                     .anyRequest().denyAll())
-                .formLogin(form -> form.disable())
+                .formLogin(form -> form.loginPage("/login")
+                        .usernameParameter("email").passwordParameter("senha")
+                        .defaultSuccessUrl("/minha-conta", true)
+                        .failureUrl("/login?erro").permitAll())
                 .httpBasic(basic -> basic.disable())
-                .logout(logout -> logout.disable())
+                .addFilterBefore(new SessaoValidaFilter(usuarios), AuthorizationFilter.class)
+                .logout(logout -> logout.logoutUrl("/sair")
+                        .logoutSuccessUrl("/login?saiu")
+                        .invalidateHttpSession(true).clearAuthentication(true)
+                        .deleteCookies("JSESSIONID").permitAll())
                 .build();
     }
 }

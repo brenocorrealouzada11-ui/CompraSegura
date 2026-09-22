@@ -4,7 +4,7 @@ Plataforma web acadêmica para apoiar a compra e venda de smartphones e tablets 
 
 O **IMEI é o principal fator da avaliação de risco**, complementado pelas informações do aparelho e pelo histórico do vendedor. A plataforma busca dar transparência à decisão de compra; a avaliação não representa garantia de procedência ou de funcionamento.
 
-> **Em desenvolvimento:** a página inicial e o cadastro de usuário com persistência em MySQL estão implementados. Login, gerenciamento de perfil, anúncios e consulta de IMEI são as próximas etapas.
+> **Em desenvolvimento:** página inicial, cadastro, login, sessão, edição de perfil, alteração de senha e logout estão implementados. Anúncios e consulta de IMEI são as próximas etapas. O refinamento visual será feito após a implementação das funcionalidades.
 
 ## Objetivo e escopo
 
@@ -130,7 +130,21 @@ O Flyway aplica as migrações em `src/main/resources/db/migration` na inicializ
 
 Acesse [Criar conta](http://localhost:8080/cadastro) ou use o link na página inicial. Informe nome (2 a 100 caracteres), e-mail e senha (12 a 128 caracteres). O servidor valida os campos, normaliza o e-mail e impede duplicidade também por restrição no banco. A senha recebe hash PBKDF2 com salt aleatório; o texto original não é salvo.
 
-Após o envio, a página confirma a criação da conta. O cadastro ainda não autentica o usuário: login e perfil serão implementados na próxima etapa. Esta conta é um usuário do site, diferente do usuário MySQL `comprasegura_app`.
+Após o envio, a página confirma a criação da conta e oferece o link para entrar. Esta conta é um usuário do site, diferente do usuário MySQL `comprasegura_app`.
+
+## Login e minha conta
+
+Acesse [Entrar](http://localhost:8080/login) com o e-mail e a senha cadastrados no site. O login normaliza o e-mail e compara a senha com o hash armazenado usando Spring Security. E-mail inexistente e senha incorreta retornam a mesma mensagem.
+
+Após entrar, a sessão mantém o usuário autenticado e a página [Minha conta](http://localhost:8080/minha-conta) mostra apenas seu nome e e-mail. Acesso sem sessão redireciona para o login. O botão **Sair da conta** envia um POST protegido por CSRF e invalida a sessão. A senha e seu hash não são exibidos na página.
+
+### Editar perfil e alterar senha
+
+Em **Minha conta → Editar perfil**, altere nome e e-mail. Alterar apenas o nome mantém a sessão; mudar o e-mail exige a senha atual, verifica duplicidade e solicita novo login com o novo endereço.
+
+Em **Minha conta → Alterar senha**, informe a senha atual, a nova senha (12 a 128 caracteres) e sua confirmação. A nova senha deve ser diferente da atual. Após salvar, entre novamente com a nova senha.
+
+A identidade da sessão usa o ID permanente do usuário. Mudanças de e-mail ou senha incrementam a versão das credenciais: a sessão atual é encerrada e as demais são recusadas na próxima requisição. Isso também impede que uma sessão antiga acesse outra conta que venha a reutilizar o e-mail anterior. A migração V2 adiciona esse controle e uma versão de registro para detectar atualizações simultâneas, preservando as contas existentes.
 
 Para conferir os cadastros no Workbench:
 
@@ -144,4 +158,4 @@ SELECT id, nome, email FROM comprasegura.usuarios;
 .\mvnw.cmd test
 ```
 
-Os testes usam o perfil `test`, H2 em memória no modo MySQL e a mesma migração SQL, sem modificar o banco local. Cobrem inicialização, formulário público, proteção CSRF, cadastro válido, hash da senha, e-mail duplicado, campos inválidos e confirmação. H2 não substitui a verificação da aplicação com MySQL real.
+Os testes usam o perfil `test`, H2 em memória no modo MySQL e as mesmas migrações SQL, sem modificar o banco local. Cobrem cadastro, validações, hash, duplicidade, login, sessão, edição de perfil, senha atual, confirmação da nova senha, encerramento das sessões antigas, isolamento dos usuários, logout e CSRF. H2 não substitui a verificação da aplicação com MySQL real.

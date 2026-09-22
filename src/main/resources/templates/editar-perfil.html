@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar perfil | CompraSegura</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/css/cadastro.css}">
+</head>
+<body>
+<header class="cabecalho"><div class="container cabecalho-conteudo">
+    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
+    <a th:href="@{/minha-conta}" class="voltar">Minha conta</a>
+</div></header>
+<main class="pagina-cadastro"><section class="formulario-cartao" aria-labelledby="titulo">
+    <p class="etiqueta">Minha conta</p><h1 id="titulo">Editar perfil</h1>
+    <p class="introducao">Atualize seu nome e e-mail. Para mudar o e-mail, confirme sua senha atual. Depois, será necessário entrar novamente.</p>
+    <form th:action="@{/minha-conta/editar}" th:object="${perfil}" method="post">
+        <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}">
+            <p>Confira os dados abaixo para continuar.</p><p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+        </div>
+        <div class="campo"><label for="nome">Nome</label>
+            <input id="nome" type="text" th:field="*{nome}" autocomplete="name" required minlength="2" maxlength="100" aria-describedby="erro-nome" th:attr="aria-invalid=${#fields.hasErrors('nome')}">
+            <span id="erro-nome" class="erro-campo" th:errors="*{nome}"></span>
+        </div>
+        <div class="campo"><label for="email">E-mail</label>
+            <input id="email" type="email" th:field="*{email}" autocomplete="email" required maxlength="254" aria-describedby="erro-email" th:attr="aria-invalid=${#fields.hasErrors('email')}">
+            <span id="erro-email" class="erro-campo" th:errors="*{email}"></span>
+        </div>
+        <div class="campo"><label for="senhaAtual">Senha atual</label>
+            <input id="senhaAtual" name="senhaAtual" type="password" autocomplete="current-password" maxlength="128" aria-describedby="ajuda-senha erro-senha" th:attr="aria-invalid=${#fields.hasErrors('senhaAtual')}">
+            <small id="ajuda-senha">Necessária somente se você alterar o e-mail.</small>
+            <span id="erro-senha" class="erro-campo" th:errors="*{senhaAtual}"></span>
+        </div>
+        <button class="botao-principal" type="submit">Salvar alterações</button>
+    </form>
+    <p class="introducao" style="margin: 24px 0 0;"><a th:href="@{/minha-conta}">Cancelar</a></p>
+</section></main>
+</body></html>

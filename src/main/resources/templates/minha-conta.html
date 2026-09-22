@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha conta | CompraSegura</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastro.css}">
+</head>
+<body>
+<header class="cabecalho"><div class="container cabecalho-conteudo">
+    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
+    <a th:href="@{/}" class="voltar">Voltar ao início</a>
+</div></header>
+<main class="pagina-cadastro">
+    <section class="formulario-cartao" aria-labelledby="titulo">
+        <p class="etiqueta">Você está conectado</p>
+        <h1 id="titulo">Minha conta</h1>
+        <p class="introducao" role="status" th:if="${perfilSalvo}">Perfil atualizado com sucesso.</p>
+        <dl class="introducao" style="overflow-wrap: anywhere;">
+            <dt><strong>Nome</strong></dt><dd th:text="${nome}" style="margin-bottom: 16px;"></dd>
+            <dt><strong>E-mail</strong></dt><dd th:text="${email}"></dd>
+        </dl>
+        <p class="introducao">
+            <a th:href="@{/minha-conta/editar}" style="color: #0f766e; text-decoration: underline;">Editar perfil</a>
+            <span aria-hidden="true"> · </span>
+            <a th:href="@{/minha-conta/senha}" style="color: #0f766e; text-decoration: underline;">Alterar senha</a>
+        </p>
+        <form th:action="@{/sair}" method="post">
+            <button class="botao-principal" type="submit">Sair da conta</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

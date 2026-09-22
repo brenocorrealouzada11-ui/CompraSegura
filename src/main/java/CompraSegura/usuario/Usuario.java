@@ -18,6 +18,13 @@ public class Usuario {
     @Column(name = "senha_hash", nullable = false, length = 255)
     private String senhaHash;
 
+    @Column(name = "versao_credenciais", nullable = false)
+    private long versaoCredenciais;
+
+    @Version
+    @Column(name = "versao_registro", nullable = false)
+    private long versaoRegistro;
+
     protected Usuario() { }
 
     public Usuario(String nome, String email, String senhaHash) {
@@ -30,4 +37,18 @@ public class Usuario {
     public String getNome() { return nome; }
     public String getEmail() { return email; }
     public String getSenhaHash() { return senhaHash; }
+    public long getVersaoCredenciais() { return versaoCredenciais; }
+
+    public void atualizarPerfil(String nome, String email) {
+        this.nome = nome;
+        if (!this.email.equals(email)) {
+            this.email = email;
+            this.versaoCredenciais++;
+        }
+    }
+
+    public void alterarSenha(String senhaHash) {
+        this.senhaHash = senhaHash;
+        this.versaoCredenciais++;
+    }
 }
