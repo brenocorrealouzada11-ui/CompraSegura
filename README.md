@@ -4,7 +4,7 @@ Plataforma web acadêmica para apoiar a compra e venda de smartphones e tablets 
 
 O **IMEI é o principal fator da avaliação de risco**, complementado pelas informações do aparelho e pelo histórico do vendedor. A plataforma busca dar transparência à decisão de compra; a avaliação não representa garantia de procedência ou de funcionamento.
 
-> **Em desenvolvimento:** página inicial, cadastro, login, sessão, edição de perfil, alteração de senha e logout estão implementados. Anúncios e consulta de IMEI são as próximas etapas. O refinamento visual será feito após a implementação das funcionalidades.
+> **Em desenvolvimento:** página inicial, cadastro, login, sessão, edição de perfil, alteração de senha e logout estão implementados. A área Minha conta tem navegação própria, acesso destacado à troca de senha e cadastro de anúncios como rascunhos privados, com vários IMEIs por aparelho. Evidência, consulta de IMEI e publicação são as próximas etapas.
 
 ## Objetivo e escopo
 
@@ -79,7 +79,7 @@ Na modelagem acordada, `Cadastrar anúncio` inclui `Validar aparelho`, que inclu
 
 Um usuário pode publicar vários anúncios; cada anúncio pertence a um usuário e apresenta um aparelho. O aparelho possui tipo, modelo, um ou mais IMEIs e evidência de identificação. Cada IMEI pode ter várias consultas, e o anúncio recebe uma avaliação de confiabilidade.
 
-`Usuario` já está implementada com nome, e-mail e hash da senha. As demais entidades representam o planejamento do domínio. Os arquivos-fonte `.puml`/`.plantuml` ainda serão reconstruídos; esta seção resume a modelagem registrada no histórico do projeto.
+`Usuario`, `Anuncio` e `Aparelho` estão implementadas. Nesta primeira versão, `TipoAparelho` é um enum, e `ModeloAparelho` e `IMEI` são objetos de valor incorporados ao aparelho. Evidências, consultas e avaliações ainda representam o planejamento do domínio. Os arquivos-fonte `.puml`/`.plantuml` ainda serão reconstruídos; esta seção resume a modelagem registrada no histórico do projeto.
 
 ## Tecnologias
 
@@ -93,7 +93,7 @@ Um usuário pode publicar vários anúncios; cada anúncio pertence a um usuári
 | Maven e Maven Wrapper | Gerenciamento de dependências e execução |
 | Spring Boot DevTools | Dependência de apoio ao desenvolvimento |
 | JavaScript | Previsto para interações do frontend |
-| MySQL 8.4 | Persistência dos usuários na porta local 3308 |
+| MySQL 8.4 | Persistência de usuários, aparelhos e anúncios na porta local 3308 |
 | Flyway | Migrações versionadas do banco de dados |
 | Spring Security | Hash de senhas com PBKDF2 e proteção CSRF do formulário |
 | Spring Data JPA | Dependencia adicionada para persistencia |
@@ -136,7 +136,7 @@ Após o envio, a página confirma a criação da conta e oferece o link para ent
 
 Acesse [Entrar](http://localhost:8080/login) com o e-mail e a senha cadastrados no site. O login normaliza o e-mail e compara a senha com o hash armazenado usando Spring Security. E-mail inexistente e senha incorreta retornam a mesma mensagem.
 
-Após entrar, a sessão mantém o usuário autenticado e a página [Minha conta](http://localhost:8080/minha-conta) mostra apenas seu nome e e-mail. Acesso sem sessão redireciona para o login. O botão **Sair da conta** envia um POST protegido por CSRF e invalida a sessão. A senha e seu hash não são exibidos na página.
+Após entrar, a sessão mantém o usuário autenticado e a página [Minha conta](http://localhost:8080/minha-conta) reúne dados pessoais, segurança e acesso aos seus anúncios. Acesso sem sessão redireciona para o login. O botão **Sair** envia um POST protegido por CSRF e invalida a sessão. A senha e seu hash não são exibidos na página.
 
 ### Editar perfil e alterar senha
 
@@ -152,10 +152,27 @@ Para conferir os cadastros no Workbench:
 SELECT id, nome, email FROM comprasegura.usuarios;
 ```
 
+## Anúncios e aparelhos
+
+Em **Minha conta → Novo anúncio**, informe título, preço, tipo, marca, modelo e todos os IMEIs. Conservação e histórico de reparos são selecionados em listas; observações são opcionais. São aceitos smartphones e tablets com conexão celular. Informe um IMEI por linha; cada identificador deve conter 15 dígitos e não pode se repetir no mesmo aparelho. A interface usa separadores visuais (ex.: `12345678-901234-5`); o banco guarda somente os dígitos. A identificação automática do modelo por IMEI ainda não está implementada.
+
+O anúncio é salvo como **RASCUNHO**, associado à conta autenticada. **Meus anúncios** lista somente os próprios rascunhos, com paginação, e permite abrir seus detalhes. O servidor rejeita acesso aos detalhes de outro usuário. Os IMEIs completos aparecem somente na área privada do proprietário. **Excluir rascunho** está disponível na lista e nos detalhes, abre uma confirmação e remove o anúncio, o aparelho e seus IMEIs. A operação exige sessão do proprietário e CSRF; anúncios que não sejam rascunhos não podem ser excluídos por essa ação. O nome CompraSegura no cabeçalho da conta não possui link; somente **Sair** encerra a sessão.
+
+A migração V3 cria `aparelhos`, `aparelho_imeis` e `anuncios`. Todos os IMEIs informados são persistidos em ordem. A validação atual confere campos obrigatórios, preço e formato dos identificadores; não confirma a regularidade do aparelho nem se todos os IMEIs físicos foram declarados. Não há consulta externa, avaliação ou publicação nesta etapa.
+
+### Próximas etapas
+
+- Envio e validação da evidência de identificação.
+- Consultas simuladas, claramente identificadas, e avaliação de confiabilidade.
+- Publicação, pesquisa, detalhes públicos e histórico do vendedor.
+- Edição de anúncios e gerenciamento dos anúncios publicados com controle de permissão.
+- Integração real de IMEI quando o provedor estiver definido.
+- Refinamento das demais telas e ampliação dos testes.
+
 ## Testes
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-Os testes usam o perfil `test`, H2 em memória no modo MySQL e as mesmas migrações SQL, sem modificar o banco local. Cobrem cadastro, validações, hash, duplicidade, login, sessão, edição de perfil, senha atual, confirmação da nova senha, encerramento das sessões antigas, isolamento dos usuários, logout e CSRF. H2 não substitui a verificação da aplicação com MySQL real.
+Os testes usam o perfil `test`, H2 em memória no modo MySQL e as mesmas migrações SQL, sem modificar o banco local. Cobrem cadastro, validações, hash, duplicidade, login, sessão, edição de perfil, senha atual, confirmação da nova senha, encerramento das sessões antigas, isolamento dos usuários, logout e CSRF. Também cobrem a criação dos rascunhos, múltiplos IMEIs, validações, associação ao proprietário, isolamento dos anúncios e escape de conteúdo. H2 não substitui a verificação da aplicação com MySQL real.

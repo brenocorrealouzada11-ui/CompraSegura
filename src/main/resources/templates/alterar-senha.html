@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alterar senha | CompraSegura</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/css/cadastro.css}">
+    <link rel="stylesheet" th:href="@{/css/conta.css}">
 </head>
 <body>
-<header class="cabecalho"><div class="container cabecalho-conteudo">
-    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
-    <a th:href="@{/minha-conta}" class="voltar">Minha conta</a>
-</div></header>
-<main class="pagina-cadastro"><section class="formulario-cartao" aria-labelledby="titulo">
-    <p class="etiqueta">Minha conta</p><h1 id="titulo">Alterar senha</h1>
+<header th:replace="~{fragments/conta :: header}"></header>
+<div class="shell"><aside th:replace="~{fragments/conta :: sidebar('senha')}"></aside>
+<main id="conteudo"><section class="card form-card" aria-labelledby="titulo">
+    <p class="eyebrow">Minha conta</p><h1 id="titulo">Alterar senha</h1>
     <p class="introducao">Após salvar, entre novamente com a nova senha. As outras sessões também precisarão de um novo login.</p>
     <form th:action="@{/minha-conta/senha}" th:object="${senha}" method="post">
         <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}">
@@ -33,5 +31,5 @@
         <button class="botao-principal" type="submit">Salvar nova senha</button>
     </form>
     <p class="introducao" style="margin: 24px 0 0;"><a th:href="@{/minha-conta}">Cancelar</a></p>
-</section></main>
+</section></main></div>
 </body></html>

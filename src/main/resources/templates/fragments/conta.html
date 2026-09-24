@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><body>
+<header class="topbar" th:fragment="header">
+    <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+    <span class="logo">Compra<span>Segura</span></span>
+    <div class="top-actions"><form th:action="@{/sair}" method="post"><button class="text-button" type="submit">Sair</button></form></div>
+</header>
+<aside class="sidebar" th:fragment="sidebar(ativo)">
+    <p class="sidebar-label">Seu espaço</p>
+    <nav aria-label="Menu da conta">
+        <a class="nav-link" th:href="@{/minha-conta}" th:attr="aria-current=${ativo == 'conta' ? 'page' : null}">Minha conta</a>
+        <a class="nav-link" th:href="@{/minha-conta/anuncios}" th:attr="aria-current=${ativo == 'anuncios' ? 'page' : null}">Meus anúncios</a>
+        <a class="nav-link" th:href="@{/minha-conta/editar}" th:attr="aria-current=${ativo == 'perfil' ? 'page' : null}">Editar perfil</a>
+        <a class="nav-link" th:href="@{/minha-conta/senha}" th:attr="aria-current=${ativo == 'senha' ? 'page' : null}">Alterar senha</a>
+    </nav>
+    <p class="sidebar-note">Uma conta para comprar e anunciar, com suas informações sempre à mão.</p>
+</aside>
+</body></html>

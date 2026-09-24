@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excluir rascunho | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}">
+</head><body><header th:replace="~{fragments/conta :: header}"></header>
+<div class="shell"><aside th:replace="~{fragments/conta :: sidebar('anuncios')}"></aside><main id="conteudo">
+<section class="card form-card"><p class="eyebrow">Meus anúncios</p><h1>Excluir este rascunho?</h1>
+<h2 th:text="${anuncio.titulo}"></h2><p>O rascunho e os dados deste aparelho, incluindo os IMEIs, serão excluídos. Essa ação não pode ser desfeita.</p>
+<div class="aviso-erro" role="alert" th:if="${erroExclusao}" th:text="${erroExclusao}"></div>
+<form th:action="@{/minha-conta/anuncios/{id}/excluir(id=${anuncio.id})}" method="post">
+<div class="actions"><button class="button danger" type="submit">Sim, excluir rascunho</button><a th:href="@{/minha-conta/anuncios/{id}(id=${anuncio.id})}">Cancelar</a></div>
+</form></section></main></div></body></html>

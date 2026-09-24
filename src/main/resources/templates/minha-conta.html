@@ -1,35 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha conta | CompraSegura</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/cadastro.css}">
-</head>
-<body>
-<header class="cabecalho"><div class="container cabecalho-conteudo">
-    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
-    <a th:href="@{/}" class="voltar">Voltar ao início</a>
-</div></header>
-<main class="pagina-cadastro">
-    <section class="formulario-cartao" aria-labelledby="titulo">
-        <p class="etiqueta">Você está conectado</p>
-        <h1 id="titulo">Minha conta</h1>
-        <p class="introducao" role="status" th:if="${perfilSalvo}">Perfil atualizado com sucesso.</p>
-        <dl class="introducao" style="overflow-wrap: anywhere;">
-            <dt><strong>Nome</strong></dt><dd th:text="${nome}" style="margin-bottom: 16px;"></dd>
-            <dt><strong>E-mail</strong></dt><dd th:text="${email}"></dd>
-        </dl>
-        <p class="introducao">
-            <a th:href="@{/minha-conta/editar}" style="color: #0f766e; text-decoration: underline;">Editar perfil</a>
-            <span aria-hidden="true"> · </span>
-            <a th:href="@{/minha-conta/senha}" style="color: #0f766e; text-decoration: underline;">Alterar senha</a>
-        </p>
-        <form th:action="@{/sair}" method="post">
-            <button class="botao-principal" type="submit">Sair da conta</button>
-        </form>
-    </section>
-</main>
-</body>
-</html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha conta | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}">
+</head><body>
+<header th:replace="~{fragments/conta :: header}"></header>
+<div class="shell"><aside th:replace="~{fragments/conta :: sidebar('conta')}"></aside>
+<main id="conteudo">
+    <div class="page-heading"><p class="eyebrow">Tudo em um só lugar</p><h1>Minha conta</h1><p>Cuide do seu perfil e prepare seu próximo anúncio.</p></div>
+    <div class="success" role="status" th:if="${perfilSalvo}">Perfil atualizado com sucesso.</div>
+    <div class="grid">
+        <section class="card" aria-labelledby="perfil-titulo"><div class="identity"><span class="avatar" aria-hidden="true" th:text="${inicial}">B</span><div><h2 id="perfil-titulo" th:text="${nome}">Seu nome</h2><p th:text="${email}">Seu e-mail</p></div></div><p>Seus dados pessoais, sempre atualizados.</p><a class="button secondary" th:href="@{/minha-conta/editar}">Editar perfil</a></section>
+        <section class="card" aria-labelledby="seguranca-titulo"><h2 id="seguranca-titulo">Segurança da conta</h2><p>Atualize sua senha usando a senha atual para confirmar a mudança.</p><div class="security-mark" aria-hidden="true">••••••••</div><a class="button" th:href="@{/minha-conta/senha}">Alterar senha</a></section>
+    </div>
+    <section class="card feature"><div><p class="eyebrow">Pronto para o próximo passo?</p><h2>Seu aparelho tem uma nova história.</h2><p>Cadastre os detalhes e os IMEIs. Seu anúncio fica salvo como rascunho, visível somente para você.</p></div><a class="button" th:href="@{/minha-conta/anuncios/novo}">+ Novo anúncio</a></section>
+    <div class="section-heading"><h2>Seus anúncios <span class="badge" th:text="${totalAnuncios}">0</span></h2><a th:href="@{/minha-conta/anuncios}">Ver todos →</a></div>
+    <section class="card empty" th:if="${totalAnuncios == 0}"><span class="empty-symbol" aria-hidden="true">▤</span><h3>Seu primeiro anúncio começa aqui</h3><p>Você ainda não tem anúncios. Comece pelo aparelho que deseja vender.</p><a th:href="@{/minha-conta/anuncios/novo}">Criar meu primeiro anúncio</a></section>
+    <section class="card" th:if="${totalAnuncios > 0}"><h3>Seus rascunhos estão salvos</h3><p>Acesse os detalhes dos aparelhos em Meus anúncios.</p><a th:href="@{/minha-conta/anuncios}">Abrir meus anúncios →</a></section>
+</main></div></body></html>

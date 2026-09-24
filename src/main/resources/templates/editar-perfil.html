@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar perfil | CompraSegura</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/css/cadastro.css}">
+    <link rel="stylesheet" th:href="@{/css/conta.css}">
 </head>
 <body>
-<header class="cabecalho"><div class="container cabecalho-conteudo">
-    <a th:href="@{/}" class="logo">Compra<span>Segura</span></a>
-    <a th:href="@{/minha-conta}" class="voltar">Minha conta</a>
-</div></header>
-<main class="pagina-cadastro"><section class="formulario-cartao" aria-labelledby="titulo">
-    <p class="etiqueta">Minha conta</p><h1 id="titulo">Editar perfil</h1>
+<header th:replace="~{fragments/conta :: header}"></header>
+<div class="shell"><aside th:replace="~{fragments/conta :: sidebar('perfil')}"></aside>
+<main id="conteudo"><section class="card form-card" aria-labelledby="titulo">
+    <p class="eyebrow">Minha conta</p><h1 id="titulo">Editar perfil</h1>
     <p class="introducao">Atualize seu nome e e-mail. Para mudar o e-mail, confirme sua senha atual. Depois, será necessário entrar novamente.</p>
     <form th:action="@{/minha-conta/editar}" th:object="${perfil}" method="post">
         <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}">
@@ -32,6 +30,7 @@
         </div>
         <button class="botao-principal" type="submit">Salvar alterações</button>
     </form>
+    <div class="form-footer"><h2>Quer mudar sua senha?</h2><p>Use a senha atual para confirmar e escolha uma nova senha.</p><a class="button secondary" th:href="@{/minha-conta/senha}">Alterar senha</a></div>
     <p class="introducao" style="margin: 24px 0 0;"><a th:href="@{/minha-conta}">Cancelar</a></p>
-</section></main>
+</section></main></div>
 </body></html>

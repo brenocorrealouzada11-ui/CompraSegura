@@ -35,7 +35,7 @@ public class SegurancaConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, UsuarioRepository usuarios) throws Exception {
         // O Spring Security verifica o hash e administra a sessao, mantendo CSRF ativo.
         return http.authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/", "/index.html", "/css/**", "/cadastro", "/cadastro/sucesso", "/login", "/error").permitAll()
+                    .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/cadastro", "/cadastro/sucesso", "/login", "/error").permitAll()
                     .requestMatchers("/minha-conta", "/minha-conta/**").authenticated()
                     .anyRequest().denyAll())
                 .formLogin(form -> form.loginPage("/login")

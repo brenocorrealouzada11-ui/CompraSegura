@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Detalhes do anúncio | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}"></head><body>
+<header th:replace="~{fragments/conta :: header}"></header><div class="shell"><aside th:replace="~{fragments/conta :: sidebar('anuncios')}"></aside><main id="conteudo">
+    <a class="back-link" th:href="@{/minha-conta/anuncios}">← Meus anúncios</a>
+    <div class="success" role="status" th:if="${anuncioSalvo}">Rascunho salvo com sucesso.</div>
+    <div class="page-heading"><span class="badge">Rascunho · não publicado</span><h1 th:text="${anuncio.titulo}"></h1><p th:text="${anuncio.tipo + ' · ' + anuncio.marca + ' ' + anuncio.modelo}"></p></div>
+    <div class="notice">Consulta de IMEI ainda não realizada. Este rascunho é visível somente para você; o envio de evidência e a avaliação de confiabilidade serão adicionados depois.</div>
+    <section class="card"><p class="price" th:text="${anuncio.precoFormatado}"></p><h2>Sobre o aparelho</h2><p class="preserve" th:text="${#strings.isEmpty(anuncio.descricao) ? 'Nenhuma observação adicional.' : anuncio.descricao}"></p><dl class="details"><div><dt>Estado de conservação</dt><dd class="preserve" th:text="${anuncio.condicao}"></dd></div><div><dt>Reparos e alterações declarados</dt><dd class="preserve" th:text="${anuncio.alteracoes}"></dd></div></dl><div class="form-footer"><h2>IMEIs cadastrados</h2><p>Apenas o formato de 15 dígitos foi conferido. Isso não comprova a regularidade do aparelho.</p><ul class="imei-list"><li th:each="imei : ${anuncio.imeis}" th:text="${imei}"></li></ul></div></section>
+<div class="actions"><a class="button danger-outline" th:href="@{/minha-conta/anuncios/{id}/excluir(id=${anuncio.id})}">Excluir rascunho</a></div></main></div></body></html>

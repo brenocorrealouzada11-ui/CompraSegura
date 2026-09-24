@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Novo anúncio | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}"><script defer th:src="@{/js/anuncio.js}"></script></head><body>
+<header th:replace="~{fragments/conta :: header}"></header><div class="shell"><aside th:replace="~{fragments/conta :: sidebar('anuncios')}"></aside><main id="conteudo">
+<a class="back-link" th:href="@{/minha-conta/anuncios}">← Meus anúncios</a>
+<div class="page-heading"><p class="eyebrow">Comece pelos detalhes</p><h1>Novo anúncio</h1><p>Apresente seu aparelho com informações claras e completas.</p></div>
+<div class="notice">Ao salvar, você cria um rascunho privado. A evidência, a consulta dos IMEIs e a publicação serão disponibilizadas nas próximas etapas.</div>
+<form class="card form-card" th:action="@{/minha-conta/anuncios/novo}" th:object="${anuncio}" method="post">
+<div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}"><p>Confira os dados abaixo para continuar.</p><p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p></div>
+<fieldset class="form-section"><legend>01. Seu anúncio</legend><div class="campo"><label for="titulo">Título do anúncio</label>
+<input id="titulo" type="text" th:field="*{titulo}" required minlength="5" maxlength="120" aria-describedby="ajuda-titulo erro-titulo" th:attr="aria-invalid=${#fields.hasErrors('titulo')}">
+<small id="ajuda-titulo">Ex.: Smartphone 128 GB em bom estado</small><span id="erro-titulo" class="erro-campo" th:errors="*{titulo}"></span></div>
+<div class="campo"><label for="descricao">Observações <span class="muted">(opcional)</span></label>
+<textarea id="descricao" th:field="*{descricao}" maxlength="3000" aria-describedby="ajuda-descricao erro-descricao" th:attr="aria-invalid=${#fields.hasErrors('descricao')}"></textarea>
+<small id="ajuda-descricao">Se quiser, acrescente acessórios, detalhes de reparos ou defeitos que o comprador precisa conhecer.</small><span id="erro-descricao" class="erro-campo" th:errors="*{descricao}"></span></div>
+<div class="campo"><label for="preco">Preço (R$)</label>
+<input id="preco" type="number" th:field="*{preco}" required min="0.01" step="0.01" max="9999999999.99" aria-describedby="ajuda-preco erro-preco" th:attr="aria-invalid=${#fields.hasErrors('preco')}">
+<small id="ajuda-preco"></small><span id="erro-preco" class="erro-campo" th:errors="*{preco}"></span></div></fieldset>
+<fieldset class="form-section"><legend>02. O aparelho</legend>
+<div class="campo"><label for="tipo">Tipo de aparelho</label><select id="tipo" th:field="*{tipo}" required aria-describedby="erro-tipo" th:attr="aria-invalid=${#fields.hasErrors('tipo')}"><option value="">Selecione o tipo</option><option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.descricao}"></option></select><span id="erro-tipo" class="erro-campo" th:errors="*{tipo}"></span></div>
+<div class="grid"><div class="campo"><label for="marca">Marca</label>
+<input id="marca" type="text" th:field="*{marca}" required maxlength="80" aria-describedby="ajuda-marca erro-marca" th:attr="aria-invalid=${#fields.hasErrors('marca')}">
+<small id="ajuda-marca"></small><span id="erro-marca" class="erro-campo" th:errors="*{marca}"></span></div>
+<div class="campo"><label for="modelo">Modelo</label>
+<input id="modelo" type="text" th:field="*{modelo}" required maxlength="100" aria-describedby="ajuda-modelo erro-modelo" th:attr="aria-invalid=${#fields.hasErrors('modelo')}">
+<small id="ajuda-modelo"></small><span id="erro-modelo" class="erro-campo" th:errors="*{modelo}"></span></div></div><div class="campo"><label for="condicao">Estado de conservação</label>
+<select id="condicao" th:field="*{condicao}" required aria-describedby="ajuda-condicao erro-condicao" th:attr="aria-invalid=${#fields.hasErrors('condicao')}"><option value="">Selecione o estado</option><option th:each="condicao : ${condicoes}" th:value="${condicao}" th:text="${condicao.descricao}"></option></select>
+<small id="ajuda-condicao">Escolha a opção que melhor representa o aparelho.</small><span id="erro-condicao" class="erro-campo" th:errors="*{condicao}"></span></div>
+<div class="campo"><label for="reparos">Reparos e alterações</label>
+<select id="reparos" th:field="*{reparos}" required aria-describedby="erro-reparos" th:attr="aria-invalid=${#fields.hasErrors('reparos')}"><option value="">Selecione uma opção</option><option th:each="historico : ${historicosReparos}" th:value="${historico}" th:text="${historico.descricao}"></option></select>
+<span id="erro-reparos" class="erro-campo" th:errors="*{reparos}"></span></div></fieldset>
+<fieldset class="form-section"><legend>03. Identificação</legend><div class="campo"><label for="imeis" class="imei-label"><strong>Todos</strong> os IMEIs do aparelho</label>
+<textarea id="imeis" spellcheck="false" placeholder="12345678-901234-5" th:field="*{imeis}" required maxlength="1000" aria-describedby="ajuda-imeis erro-imeis" th:attr="aria-invalid=${#fields.hasErrors('imeis')}"></textarea>
+<small id="ajuda-imeis">Digite um IMEI por linha, com 15 dígitos; os traços são apenas visuais. Informe <strong>todos</strong> os que aparecem ao discar *#06#.</small><span id="erro-imeis" class="erro-campo" th:errors="*{imeis}"></span></div><p class="muted">Neste momento, conferimos apenas o formato informado. Nenhuma consulta de regularidade é realizada.</p></fieldset>
+<div class="actions"><button class="button" type="submit">Salvar rascunho</button><a th:href="@{/minha-conta/anuncios}">Cancelar</a></div>
+</form></main></div></body></html>
+
