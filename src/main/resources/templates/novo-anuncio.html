@@ -3,14 +3,14 @@
 <header th:replace="~{fragments/conta :: header}"></header><div class="shell"><aside th:replace="~{fragments/conta :: sidebar('anuncios')}"></aside><main id="conteudo">
 <a class="back-link" th:href="@{/minha-conta/anuncios}">← Meus anúncios</a>
 <div class="page-heading"><p class="eyebrow">Comece pelos detalhes</p><h1>Novo anúncio</h1><p>Apresente seu aparelho com informações claras e completas.</p></div>
-<div class="notice">Ao salvar, você cria um rascunho privado. A evidência, a consulta dos IMEIs e a publicação serão disponibilizadas nas próximas etapas.</div>
-<form class="card form-card" th:action="@{/minha-conta/anuncios/novo}" th:object="${anuncio}" method="post">
+<div class="notice">Preencha os dados, anexe a evidência e verifique o aparelho nesta página antes de salvar. A consulta é simulada. Seu anúncio só será criado quando você clicar em Salvar rascunho.</div>
+<form class="card form-card" th:action="@{/minha-conta/anuncios/novo}" th:object="${anuncio}" method="post" enctype="multipart/form-data" id="form-anuncio" th:attr="data-avaliacao-url=@{/minha-conta/anuncios/novo/avaliar}">
 <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}"><p>Confira os dados abaixo para continuar.</p><p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p></div>
 <fieldset class="form-section"><legend>01. Seu anúncio</legend><div class="campo"><label for="titulo">Título do anúncio</label>
 <input id="titulo" type="text" th:field="*{titulo}" required minlength="5" maxlength="120" aria-describedby="ajuda-titulo erro-titulo" th:attr="aria-invalid=${#fields.hasErrors('titulo')}">
 <small id="ajuda-titulo">Ex.: Smartphone 128 GB em bom estado</small><span id="erro-titulo" class="erro-campo" th:errors="*{titulo}"></span></div>
-<div class="campo"><label for="descricao">Observações <span class="muted">(opcional)</span></label>
-<textarea id="descricao" th:field="*{descricao}" maxlength="3000" aria-describedby="ajuda-descricao erro-descricao" th:attr="aria-invalid=${#fields.hasErrors('descricao')}"></textarea>
+<div class="campo"><label for="descricao">Observações <span id="regra-observacoes" class="muted" th:text="${anuncio.reparos?.name() == 'COM_REPAROS' ? '(mínimo de 20 caracteres)' : '(opcional)'}">(opcional)</span></label>
+<textarea id="descricao" th:field="*{descricao}" maxlength="3000" aria-describedby="ajuda-descricao erro-descricao" th:attr="aria-invalid=${#fields.hasErrors('descricao')},required=${anuncio.reparos?.name() == 'COM_REPAROS' ? 'required' : null},minlength=${anuncio.reparos?.name() == 'COM_REPAROS' ? 20 : null}"></textarea>
 <small id="ajuda-descricao">Se quiser, acrescente acessórios, detalhes de reparos ou defeitos que o comprador precisa conhecer.</small><span id="erro-descricao" class="erro-campo" th:errors="*{descricao}"></span></div>
 <div class="campo"><label for="preco">Preço (R$)</label>
 <input id="preco" type="number" th:field="*{preco}" required min="0.01" step="0.01" max="9999999999.99" aria-describedby="ajuda-preco erro-preco" th:attr="aria-invalid=${#fields.hasErrors('preco')}">
@@ -26,11 +26,23 @@
 <select id="condicao" th:field="*{condicao}" required aria-describedby="ajuda-condicao erro-condicao" th:attr="aria-invalid=${#fields.hasErrors('condicao')}"><option value="">Selecione o estado</option><option th:each="condicao : ${condicoes}" th:value="${condicao}" th:text="${condicao.descricao}"></option></select>
 <small id="ajuda-condicao">Escolha a opção que melhor representa o aparelho.</small><span id="erro-condicao" class="erro-campo" th:errors="*{condicao}"></span></div>
 <div class="campo"><label for="reparos">Reparos e alterações</label>
-<select id="reparos" th:field="*{reparos}" required aria-describedby="erro-reparos" th:attr="aria-invalid=${#fields.hasErrors('reparos')}"><option value="">Selecione uma opção</option><option th:each="historico : ${historicosReparos}" th:value="${historico}" th:text="${historico.descricao}"></option></select>
+<select id="reparos" th:field="*{reparos}" required aria-describedby="ajuda-reparos erro-reparos" th:attr="aria-invalid=${#fields.hasErrors('reparos')}"><option value="">Selecione uma opção</option><option th:each="historico : ${historicosReparos}" th:value="${historico}" th:text="${historico.descricao}"></option></select>
+<small id="ajuda-reparos" aria-live="polite" th:attr="hidden=${anuncio.reparos?.name() == 'COM_REPAROS' ? null : 'hidden'}">Informe os reparos e alterações feitos no aparelho no campo OBS (Observações), com pelo menos 20 caracteres.</small>
 <span id="erro-reparos" class="erro-campo" th:errors="*{reparos}"></span></div></fieldset>
 <fieldset class="form-section"><legend>03. Identificação</legend><div class="campo"><label for="imeis" class="imei-label"><strong>Todos</strong> os IMEIs do aparelho</label>
 <textarea id="imeis" spellcheck="false" placeholder="12345678-901234-5" th:field="*{imeis}" required maxlength="1000" aria-describedby="ajuda-imeis erro-imeis" th:attr="aria-invalid=${#fields.hasErrors('imeis')}"></textarea>
-<small id="ajuda-imeis">Digite um IMEI por linha, com 15 dígitos; os traços são apenas visuais. Informe <strong>todos</strong> os que aparecem ao discar *#06#.</small><span id="erro-imeis" class="erro-campo" th:errors="*{imeis}"></span></div><p class="muted">Neste momento, conferimos apenas o formato informado. Nenhuma consulta de regularidade é realizada.</p></fieldset>
+<small id="ajuda-imeis">Digite um IMEI por linha, com 15 dígitos; os traços são apenas visuais. Informe <strong>todos</strong> os que aparecem ao discar *#06#.</small><span id="erro-imeis" class="erro-campo" th:errors="*{imeis}"></span></div><p class="muted">A consulta abaixo usa cenários de demonstração; não confirma a regularidade do aparelho.</p></fieldset>
+<fieldset class="form-section"><legend>04. Evidência e verificação</legend>
+<div class="campo"><label for="arquivo">Imagem dos IMEIs <span class="muted">(opcional para o rascunho)</span></label>
+<input id="arquivo" name="arquivo" type="file" accept="image/png,image/jpeg" aria-describedby="ajuda-arquivo">
+<small id="ajuda-arquivo">Foto ou captura do *#06# mostrando todos os IMEIs. PNG/JPEG de até 5 MB. O envio da imagem não confirma sua autenticidade.</small></div>
+<p class="notice" th:if="${reselecionarImagem}">Confira os campos e selecione novamente a imagem antes de salvar.</p>
+<details class="simulation-examples"><summary>Como testar a simulação</summary><p>Use os números fictícios abaixo, um por linha. Eles servem apenas para demonstração.</p><ul><li><code>000000000000001</code>: sem restrição simulada.</li><li><code>000000000000002</code>: restrição simulada.</li><li><code>000000000000003</code>: resultado inconclusivo.</li><li><code>000000000000004</code>: serviço indisponível.</li></ul><p>Outros números retornam inconclusivo. Nenhum IMEI é enviado a um serviço externo.</p></details>
+<button class="button secondary" type="button" id="verificar-aparelho" hidden>Verificar aparelho — simulação</button>
+<noscript><p>Ative o JavaScript para ver a prévia nesta página. Ao salvar, a avaliação simulada será calculada no servidor e exibida nos detalhes.</p></noscript>
+<p id="status-verificacao" class="muted" role="status" aria-live="polite"></p>
+<div id="resultado-verificacao" hidden></div>
+</fieldset>
 <div class="actions"><button class="button" type="submit">Salvar rascunho</button><a th:href="@{/minha-conta/anuncios}">Cancelar</a></div>
 </form></main></div></body></html>
 

@@ -4,6 +4,33 @@
     <a class="back-link" th:href="@{/minha-conta/anuncios}">← Meus anúncios</a>
     <div class="success" role="status" th:if="${anuncioSalvo}">Rascunho salvo com sucesso.</div>
     <div class="page-heading"><span class="badge">Rascunho · não publicado</span><h1 th:text="${anuncio.titulo}"></h1><p th:text="${anuncio.tipo + ' · ' + anuncio.marca + ' ' + anuncio.modelo}"></p></div>
-    <div class="notice">Consulta de IMEI ainda não realizada. Este rascunho é visível somente para você; o envio de evidência e a avaliação de confiabilidade serão adicionados depois.</div>
+    <div class="notice">Este rascunho é visível somente para você. As consultas disponíveis são simuladas e não comprovam a regularidade do aparelho.</div>
     <section class="card"><p class="price" th:text="${anuncio.precoFormatado}"></p><h2>Sobre o aparelho</h2><p class="preserve" th:text="${#strings.isEmpty(anuncio.descricao) ? 'Nenhuma observação adicional.' : anuncio.descricao}"></p><dl class="details"><div><dt>Estado de conservação</dt><dd class="preserve" th:text="${anuncio.condicao}"></dd></div><div><dt>Reparos e alterações declarados</dt><dd class="preserve" th:text="${anuncio.alteracoes}"></dd></div></dl><div class="form-footer"><h2>IMEIs cadastrados</h2><p>Apenas o formato de 15 dígitos foi conferido. Isso não comprova a regularidade do aparelho.</p><ul class="imei-list"><li th:each="imei : ${anuncio.imeis}" th:text="${imei}"></li></ul></div></section>
+<section id="evidencia" class="card evidence-card" aria-labelledby="titulo-evidencia">
+    <p class="eyebrow">Identificação do aparelho</p><h2 id="titulo-evidencia">Evidência dos IMEIs</h2>
+    <p>Disque <strong>*#06#</strong> no aparelho e envie uma foto ou captura legível mostrando <strong>todos</strong> os IMEIs. Se precisar de mais de uma captura, reúna-as em uma única imagem.</p>
+    <div class="success" role="status" th:if="${evidenciaSalva}">Imagem salva. A conferência da evidência ainda está pendente.</div>
+    <div class="aviso-erro" role="alert" th:if="${erroEvidencia}" th:text="${erroEvidencia}"></div>
+    <div th:if="${evidencia != null}">
+        <span class="badge">Enviada · aguardando conferência</span>
+        <p class="muted" th:text="|Enviada em ${evidencia.dataFormatada}|"></p>
+        <a th:href="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncio.id})}" target="_blank" rel="noopener">Abrir imagem em tamanho completo</a>
+        <img class="evidence-preview" th:src="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncio.id})}" alt="Evidência dos IMEIs enviada por você" loading="lazy">
+    </div>
+    <p class="notice" th:if="${evidencia == null}">Você ainda não enviou a evidência. O rascunho continua salvo.</p>
+    <form th:action="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncio.id})}" method="post" enctype="multipart/form-data">
+        <div class="campo"><label for="arquivo" th:text="${evidencia == null ? 'Escolha a imagem' : 'Substituir a imagem'}"></label>
+        <input id="arquivo" name="arquivo" type="file" accept="image/png,image/jpeg" required aria-describedby="ajuda-arquivo">
+        <small id="ajuda-arquivo">PNG ou JPEG, até 5 MB. Ao substituir, a imagem anterior é removida após o novo envio ser aceito.</small></div>
+        <button class="button" type="submit" th:text="${evidencia == null ? 'Enviar evidência' : 'Substituir evidência'}"></button>
+    </form>
+    <p class="muted evidence-note">A imagem fica visível somente para você. O envio não confirma a autenticidade, a correspondência dos dados nem a regularidade dos IMEIs.</p>
+</section>
+<section id="avaliacao" class="card evidence-card">
+<div class="success" role="status" th:if="${avaliacaoAtualizada}">Avaliação simulada atualizada.</div>
+<div class="aviso-erro" role="alert" th:if="${erroAvaliacao}" th:text="${erroAvaliacao}"></div>
+<div th:if="${relatorio != null}"><section th:replace="~{fragments/avaliacao :: resultado}"></section></div>
+<div th:if="${relatorio == null}"><h2>Avaliação de confiabilidade</h2><p>Este rascunho ainda não tem avaliação. Você pode fazer a verificação simulada abaixo.</p></div>
+<form th:action="@{/minha-conta/anuncios/{id}/avaliar(id=${anuncio.id})}" method="post"><button class="button secondary" type="submit">Atualizar avaliação simulada</button></form>
+</section>
 <div class="actions"><a class="button danger-outline" th:href="@{/minha-conta/anuncios/{id}/excluir(id=${anuncio.id})}">Excluir rascunho</a></div></main></div></body></html>

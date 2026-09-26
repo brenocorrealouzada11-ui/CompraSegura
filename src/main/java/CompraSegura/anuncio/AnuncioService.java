@@ -1,6 +1,8 @@
 package CompraSegura.anuncio;
 
 import CompraSegura.usuario.*;
+import CompraSegura.evidencia.EvidenciaRepository;
+import CompraSegura.confiabilidade.AvaliacaoRepository;
 import jakarta.validation.Valid;
 import java.util.*;
 import org.springframework.data.domain.Page;
@@ -15,18 +17,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class AnuncioService {
     private final AnuncioRepository anuncios;
     private final UsuarioRepository usuarios;
-    public AnuncioService(AnuncioRepository anuncios, UsuarioRepository usuarios) { this.anuncios = anuncios; this.usuarios = usuarios; }
+    private final EvidenciaRepository evidencias;
+    private final AvaliacaoRepository avaliacoes;
+    public AnuncioService(AnuncioRepository anuncios, UsuarioRepository usuarios, EvidenciaRepository evidencias, AvaliacaoRepository avaliacoes) {
+        this.anuncios = anuncios; this.usuarios = usuarios; this.evidencias = evidencias; this.avaliacoes = avaliacoes;
+    }
 
     @Transactional
     public Long criar(UsuarioAutenticado principal, @Valid AnuncioForm form) {
-        String normalizados = form.getImeis().replaceAll("(?<![0-9])([0-9]{8})[- ]([0-9]{6})[- ]([0-9])(?![0-9])", "$1$2$3");
-        var numeros = Arrays.stream(normalizados.split("[,;\\s]+" )).filter(s -> !s.isBlank()).toList();
-        if (numeros.isEmpty() || numeros.stream().anyMatch(n -> !n.matches("[0-9]{15}"))) {
-            throw new IllegalArgumentException("Cada IMEI deve conter 15 dígitos. Use apenas números ou o formato 12345678-901234-5.");
-        }
-        if (new HashSet<>(numeros).size() != numeros.size()) {
-            throw new IllegalArgumentException("Há IMEIs repetidos. Informe cada identificador apenas uma vez.");
-        }
+        var numeros = NormalizadorIMEIs.normalizar(form.getImeis());
         var vendedor = usuarios.findById(principal.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
         if (vendedor.getVersaoCredenciais() != principal.getVersaoCredenciais()) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         var aparelho = new Aparelho(form.getTipo(), new ModeloAparelho(form.getMarca(), form.getModelo()), form.getCondicao().getDescricao(), form.getReparos().getDescricao(), numeros);
@@ -40,11 +39,14 @@ public class AnuncioService {
         if (usuario.getVersaoCredenciais() != principal.getVersaoCredenciais()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        var anuncio = anuncios.findByIdAndVendedorId(id, principal.getId())
+        var anuncio = anuncios.findAutorizadoParaAtualizacao(id, principal.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (!"RASCUNHO".equals(anuncio.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Somente rascunhos podem ser excluídos por esta ação.");
         }
+        // Remove tambem a entidade gerenciada; o FK em cascata protege a integridade no banco.
+        avaliacoes.deleteByAnuncioId(id);
+        evidencias.deleteByAnuncioId(id);
         anuncios.delete(anuncio);
         anuncios.flush();
     }

@@ -4,7 +4,7 @@ Plataforma web acadêmica para apoiar a compra e venda de smartphones e tablets 
 
 O **IMEI é o principal fator da avaliação de risco**, complementado pelas informações do aparelho e pelo histórico do vendedor. A plataforma busca dar transparência à decisão de compra; a avaliação não representa garantia de procedência ou de funcionamento.
 
-> **Em desenvolvimento:** página inicial, cadastro, login, sessão, edição de perfil, alteração de senha e logout estão implementados. A área Minha conta tem navegação própria, acesso destacado à troca de senha e cadastro de anúncios como rascunhos privados, com vários IMEIs por aparelho. Evidência, consulta de IMEI e publicação são as próximas etapas.
+> **Em desenvolvimento:** página inicial, cadastro, login, sessão, edição de perfil, alteração de senha e logout estão implementados. A área Minha conta tem navegação própria, acesso destacado à troca de senha e cadastro de anúncios como rascunhos privados, com vários IMEIs por aparelho. O envio privado de evidência está implementado. O cadastro permite prévia de consultas simuladas e avaliação qualitativa antes de salvar. Conferência da evidência, integração real e publicação continuam pendentes.
 
 ## Objetivo e escopo
 
@@ -35,7 +35,7 @@ Comprador e vendedor são papéis que um mesmo usuário pode assumir.
 7. **Histórico como informação complementar:** o histórico do vendedor deve ser considerado junto aos dados do aparelho, sem substituir a consulta dos IMEIs.
 8. **Limites da consulta visíveis:** falhas de consulta e resultados inconclusivos não devem ser apresentados como confirmação de regularidade.
 
-A integração real depende da definição e do acesso a um serviço externo de consulta de IMEI. Durante o desenvolvimento, está prevista a utilização de respostas simuladas, identificadas como simulação. O provedor e a fórmula de cálculo da confiabilidade ainda não estão implementados neste repositório.
+A integração real depende da definição e do acesso a um serviço externo de consulta de IMEI. Durante o desenvolvimento, está prevista a utilização de respostas simuladas, identificadas como simulação. O simulador local e a política qualitativa de risco estão implementados; não há provedor real nem nota numérica de confiabilidade.
 
 ## Fluxo principal planejado
 
@@ -79,7 +79,7 @@ Na modelagem acordada, `Cadastrar anúncio` inclui `Validar aparelho`, que inclu
 
 Um usuário pode publicar vários anúncios; cada anúncio pertence a um usuário e apresenta um aparelho. O aparelho possui tipo, modelo, um ou mais IMEIs e evidência de identificação. Cada IMEI pode ter várias consultas, e o anúncio recebe uma avaliação de confiabilidade.
 
-`Usuario`, `Anuncio` e `Aparelho` estão implementadas. Nesta primeira versão, `TipoAparelho` é um enum, e `ModeloAparelho` e `IMEI` são objetos de valor incorporados ao aparelho. Evidências, consultas e avaliações ainda representam o planejamento do domínio. Os arquivos-fonte `.puml`/`.plantuml` ainda serão reconstruídos; esta seção resume a modelagem registrada no histórico do projeto.
+`Usuario`, `Anuncio` e `Aparelho` estão implementadas. Nesta primeira versão, `TipoAparelho` é um enum, e `ModeloAparelho` e `IMEI` são objetos de valor incorporados ao aparelho. `EvidenciaIMEI` também está implementada. `ConsultaIMEI` e `RegistroAvaliacao` persistem os resultados simulados e o histórico da avaliação qualitativa. Os arquivos-fonte `.puml`/`.plantuml` ainda serão reconstruídos; esta seção resume a modelagem registrada no histórico do projeto.
 
 ## Tecnologias
 
@@ -154,20 +154,53 @@ SELECT id, nome, email FROM comprasegura.usuarios;
 
 ## Anúncios e aparelhos
 
-Em **Minha conta → Novo anúncio**, informe título, preço, tipo, marca, modelo e todos os IMEIs. Conservação e histórico de reparos são selecionados em listas; observações são opcionais. São aceitos smartphones e tablets com conexão celular. Informe um IMEI por linha; cada identificador deve conter 15 dígitos e não pode se repetir no mesmo aparelho. A interface usa separadores visuais (ex.: `12345678-901234-5`); o banco guarda somente os dígitos. A identificação automática do modelo por IMEI ainda não está implementada.
+Em **Minha conta → Novo anúncio**, informe título, preço, tipo, marca, modelo e todos os IMEIs. Conservação e histórico de reparos são selecionados em listas; observações são opcionais, exceto ao selecionar **Já passou por reparos ou alterações**: nesse caso, descreva os reparos com no mínimo 20 caracteres. A regra é aplicada na interface e no servidor. São aceitos smartphones e tablets com conexão celular. Informe um IMEI por linha; cada identificador deve conter 15 dígitos e não pode se repetir no mesmo aparelho. A interface usa separadores visuais (ex.: `12345678-901234-5`); o banco guarda somente os dígitos. A identificação automática do modelo por IMEI ainda não está implementada.
 
 O anúncio é salvo como **RASCUNHO**, associado à conta autenticada. **Meus anúncios** lista somente os próprios rascunhos, com paginação, e permite abrir seus detalhes. O servidor rejeita acesso aos detalhes de outro usuário. Os IMEIs completos aparecem somente na área privada do proprietário. **Excluir rascunho** está disponível na lista e nos detalhes, abre uma confirmação e remove o anúncio, o aparelho e seus IMEIs. A operação exige sessão do proprietário e CSRF; anúncios que não sejam rascunhos não podem ser excluídos por essa ação. O nome CompraSegura no cabeçalho da conta não possui link; somente **Sair** encerra a sessão.
 
-A migração V3 cria `aparelhos`, `aparelho_imeis` e `anuncios`. Todos os IMEIs informados são persistidos em ordem. A validação atual confere campos obrigatórios, preço e formato dos identificadores; não confirma a regularidade do aparelho nem se todos os IMEIs físicos foram declarados. Não há consulta externa, avaliação ou publicação nesta etapa.
+A migração V3 cria `aparelhos`, `aparelho_imeis` e `anuncios`. Todos os IMEIs informados são persistidos em ordem. A validação atual confere campos obrigatórios, preço e formato dos identificadores; não confirma a regularidade do aparelho nem se todos os IMEIs físicos foram declarados. A avaliação simulada está disponível no formulário e nos detalhes; não há consulta externa real nem publicação nesta etapa.
 
 ### Próximas etapas
 
-- Envio e validação da evidência de identificação.
-- Consultas simuladas, claramente identificadas, e avaliação de confiabilidade.
+- Conferência da coerência entre evidência, IMEIs e modelo do aparelho.
+- Evolução da avaliação com conferência da evidência e histórico real do vendedor.
 - Publicação, pesquisa, detalhes públicos e histórico do vendedor.
 - Edição de anúncios e gerenciamento dos anúncios publicados com controle de permissão.
 - Integração real de IMEI quando o provedor estiver definido.
 - Refinamento das demais telas e ampliação dos testes.
+
+## Evidência dos IMEIs
+
+No próprio cadastro, anexe uma imagem da tela obtida com `*#06#`, mostrando todos os IMEIs. Clique em **Verificar aparelho — simulação** para ver o resultado na mesma página, antes de decidir salvar. A prévia não cria registros no banco e mantém o arquivo no formulário. Nos rascunhos existentes, a imagem também pode ser enviada pelos detalhes. São aceitos PNG/JPEG de até 5 MB, até 8.000 pixels por lado e 20 megapixels. É possível substituir a imagem no mesmo local. Uma substituição rejeitada mantém a evidência anterior.
+
+A imagem é acessível somente ao dono da conta, por uma rota autenticada, e armazenada no banco na tabela `evidencias_imei` (migração V4). O serviço decodifica a imagem e regrava os pixels, sem confiar no nome, extensão ou MIME enviado. O upload exige CSRF; a exclusão do rascunho também remove sua evidência. O armazenamento no banco mantém a gravação/substituição transacional; poderá ser trocado por armazenamento de objetos se o volume crescer.
+
+O estado mostrado é **enviada, aguardando conferência**. A verificação atual é do arquivo: não há OCR, confronto automático de IMEIs/modelo, consulta externa real ou publicação automática. A avaliação usa esse estado como pendência, sem presumir que a imagem foi conferida.
+
+## Verificação e avaliação de confiabilidade
+
+1. Preencha o anúncio e selecione a imagem, se disponível.
+2. Clique em **Verificar aparelho — simulação**. A avaliação aparece no formulário, sem salvar um rascunho. Alterar qualquer campo oculta a prévia anterior e pede uma nova verificação.
+3. Clique em **Salvar rascunho** quando quiser guardar os dados. O servidor recalcula o resultado e salva anúncio, imagem, consultas e avaliação na mesma transação. Não aceita risco ou resultado fornecidos pelo navegador.
+
+A imagem permanece selecionada durante a prévia. Se houver erro no envio definitivo do formulário, será necessário selecioná-la novamente. Sem JavaScript, a prévia dinâmica não fica disponível, mas o salvamento calcula a avaliação no servidor.
+
+O simulador não envia dados a terceiros. Cenários de demonstração (um IMEI por linha):
+
+| IMEI fictício | Cenário |
+| --- | --- |
+| `000000000000001` | Sem restrição simulada |
+| `000000000000002` | Com restrição simulada |
+| `000000000000003` | Inconclusivo |
+| `000000000000004` | Indisponível |
+
+Outros números retornam inconclusivo. Esses cenários não revelam a situação verdadeira de nenhum aparelho.
+
+A política `qualitativa-v1` usa os IMEIs como fator principal: restrições conhecidas levam a risco alto, mesmo com falhas em outros IMEIs. Ausência de consultas, simulação, evidência não conferida e histórico indisponível aparecem como pendências. Por isso, um cenário sem restrição ainda produz **avaliação inconclusiva**, e não uma aprovação real. Não há nota numérica nem bloqueio automático do anúncio.
+
+A migração V5 cria `avaliacoes_confiabilidade` e `consultas_imei`; a V6 adiciona o identificador SHA-256 da evidência. A V5 original é preservada para manter compatibilidade com bancos onde ela já foi aplicada. São preservados origem, fonte, situação, data, regra, motivos, pendências, contexto e identificação SHA-256 da imagem usada. Trocar a evidência marca a avaliação anterior como desatualizada; o dono pode atualizá-la nos detalhes. As versões anteriores permanecem no histórico. A exclusão do rascunho remove os registros associados.
+
+Consulte [a arquitetura e as regras](docs/consultas-e-confiabilidade.md) para os limites e os próximos incrementos.
 
 ## Testes
 

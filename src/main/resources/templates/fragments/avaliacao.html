@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="resultado" class="verification-panel" aria-labelledby="titulo-verificacao">
+    <div class="aviso-erro" role="alert" th:if="${errosVerificacao != null}"><h2>Confira os dados para verificar</h2><ul><li th:each="erro : ${errosVerificacao}" th:text="${erro}"></li></ul></div>
+    <div th:if="${relatorio != null}">
+        <p class="eyebrow">Avaliação de confiabilidade</p>
+        <div class="notice simulation-banner" th:if="${relatorio.avaliacao.contemSimulacao}"><strong>SIMULAÇÃO — não é uma consulta real.</strong> Os resultados servem para demonstrar o funcionamento e não comprovam a regularidade deste aparelho.</div>
+        <div class="aviso-erro" th:unless="${relatorio.atual}">Esta avaliação está desatualizada. Verifique novamente para considerar os dados atuais.</div>
+        <h2 id="titulo-verificacao" th:text="${relatorio.riscoDescricao}"></h2>
+        <p class="muted">O risco considera as informações disponíveis; não é garantia de procedência ou funcionamento. Uma restrição não bloqueia automaticamente o anúncio.</p>
+        <h3>Resultado de cada IMEI</h3>
+        <ul class="consultation-list"><li th:each="consulta : ${relatorio.consultas}">
+            <strong th:text="${consulta.imei}"></strong> <span class="badge" th:text="${consulta.origem.name() == 'SIMULADA' ? 'Simulada' : 'Real'}"></span>
+            <p th:switch="${consulta.situacao.name()}"><span th:case="'SEM_RESTRICAO'">Sem restrição no resultado recebido</span><span th:case="'COM_RESTRICAO'">Restrição indicada no resultado recebido</span><span th:case="'INCONCLUSIVA'">Resultado inconclusivo</span><span th:case="*">Consulta indisponível</span></p>
+            <p class="muted" th:text="${consulta.observacao}"></p>
+        </li></ul>
+        <h3>O que foi considerado</h3><ul><li th:each="motivo : ${relatorio.avaliacao.motivos}" th:text="${motivo}"></li></ul>
+        <div th:if="${!relatorio.avaliacao.pendencias.isEmpty()}"><h3>O que ainda precisa ser conferido</h3><ul><li th:each="pendencia : ${relatorio.avaliacao.pendencias}" th:text="${pendencia}"></li></ul></div>
+    </div>
+</section></body></html>

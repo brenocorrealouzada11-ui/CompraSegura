@@ -77,7 +77,7 @@ class AnuncioTests {
         assertThat(detalhe.titulo()).isEqualTo("Aparelho de teste");
         mvc.perform(get("/minha-conta/anuncios/" + salvo.getId()).session(sessao)).andExpect(status().isOk())
             .andExpect(content().string(containsString("123456789012345")))
-            .andExpect(content().string(containsString("Consulta de IMEI ainda não realizada")));
+            .andExpect(content().string(containsString("As consultas disponíveis são simuladas")));
         mvc.perform(get("/minha-conta/anuncios").session(sessao)).andExpect(status().isOk())
             .andExpect(content().string(containsString("Aparelho de teste")));
     }

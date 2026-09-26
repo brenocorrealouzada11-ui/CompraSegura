@@ -3,6 +3,7 @@ package CompraSegura.anuncio;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
+@ReparosDescritos
 public class AnuncioForm {
     @NotBlank(message = "Informe o título.") @Size(min = 5, max = 120, message = "Use de 5 a 120 caracteres no título.")
     private String titulo;
