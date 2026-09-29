@@ -608,3 +608,5 @@ p {
 .seller-identity { display:flex; align-items:center; gap:10px; min-width:0; }
 .seller-avatar { width:42px; height:42px; object-fit:cover; border-radius:50%; flex-shrink:0; }
 .seller-identity h1,.seller-identity h2 { margin:0; }
+
+[data-contador-mensagens][hidden] { display: none; }

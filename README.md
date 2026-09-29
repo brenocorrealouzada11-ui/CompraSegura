@@ -230,7 +230,17 @@ A migração V5 cria `avaliacoes_confiabilidade` e `consultas_imei`; a V6 adicio
 
 Consulte [a arquitetura e as regras](docs/consultas-e-confiabilidade.md) para os limites e os próximos incrementos.
 
-## Testes
+## Conversas entre comprador e vendedor
+
+Nos detalhes de um anúncio publicado, uma pessoa autenticada pode clicar em **Conversar com o vendedor**. Cada comprador tem uma conversa própria sobre aquele anúncio; iniciar novamente abre a conversa existente. O vendedor não pode conversar consigo mesmo. O menu **Mensagens** reúne as conversas e indica mensagens não lidas.
+
+As mensagens de texto aceitam até 2.000 caracteres e ficam no MySQL (migração V10). Somente os dois participantes têm acesso. O navegador atualiza a conversa a cada cinco segundos e o contador do menu a cada dez segundos, pausando em abas ocultas. A leitura é confirmada quando a conversa está visível, com foco e no final das mensagens. O histórico carrega em lotes de 50 mensagens. Repetir um envio com a mesma chave não duplica a mensagem.
+
+Retirar ou excluir o anúncio preserva a conversa, seu título original e as mensagens, informando que o anúncio está indisponível. Novos compradores só podem iniciar conversas em anúncios publicados. Não há envio de anexos, WebSocket ou notificações fora do site nesta versão. Sem JavaScript, é possível enviar mensagens e marcar a conversa como lida pelos formulários, atualizando a página para receber novas mensagens.
+
+Os testes `ChatTests` cobrem autorização dos participantes, CSRF, validação do texto, não lidas, repetição de envio, paginação, escape de HTML, preservação após exclusão e os formulários sem JavaScript.
+
+## Execução dos testes
 
 ```powershell
 .\mvnw.cmd test

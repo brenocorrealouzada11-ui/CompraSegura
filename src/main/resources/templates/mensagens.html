@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mensagens | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}"><link rel="stylesheet" th:href="@{/css/chat.css}"><script defer th:src="@{/js/chat.js}"></script></head><body>
+<header th:replace="~{fragments/conta :: header}"></header><div class="shell"><aside th:replace="~{fragments/conta :: sidebar('mensagens')}"></aside><main id="conteudo">
+<div class="page-heading"><p class="eyebrow">Seu espaço de negociação</p><h1>Mensagens</h1><p>Converse sobre os aparelhos e acompanhe as respostas por aqui.</p></div>
+<p id="status-caixa" class="muted" role="status"></p><div id="caixa-conversas" th:attr="data-url=@{/minha-conta/mensagens/lista(pagina=${pagina.number})}"><section th:replace="~{fragments/conversas :: lista}"></section></div>
+</main></div></body></html>

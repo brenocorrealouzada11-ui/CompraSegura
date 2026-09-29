@@ -28,9 +28,10 @@ public class CatalogoController {
         return "pesquisa-anuncios";
     }
     @GetMapping("/anuncios/{id}")
-    String detalhes(@PathVariable Long id, Model model) {
+    String detalhes(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado principal, Model model) {
         var detalhes = catalogo.detalhes(id);
         model.addAttribute("anuncio", detalhes.anuncio()); model.addAttribute("relatorio", detalhes.relatorio());
+        model.addAttribute("proprioAnuncio", principal != null && principal.getId().equals(detalhes.anuncio().vendedorId()));
         return "anuncio-publico";
     }
     @GetMapping("/vendedores/{id}")
