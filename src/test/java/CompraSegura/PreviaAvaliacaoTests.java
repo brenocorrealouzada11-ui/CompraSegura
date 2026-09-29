@@ -40,7 +40,7 @@ class PreviaAvaliacaoTests {
         finally { pixels.flush(); }
     }
     private MockMultipartHttpServletRequestBuilder dados(String url) throws Exception {
-        return multipart(url).file(imagem()).with(user(dono)).with(csrf())
+        return multipart(url).file(imagem()).file(TesteFotos.arquivo("fotos")).with(user(dono)).with(csrf())
             .param("titulo","Aparelho de demonstracao").param("preco","199.90").param("tipo","SMARTPHONE")
             .param("marca","Teste").param("modelo","Modelo").param("condicao","BOM").param("reparos","SEM_REPAROS")
             .param("descricao","").param("imeis","000000000000001\n000000000000002");

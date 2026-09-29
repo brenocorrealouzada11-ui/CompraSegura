@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Novo anúncio | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}"><script defer th:src="@{/js/anuncio.js}"></script></head><body>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title th:text="${modoEdicao == true ? 'Editar rascunho | CompraSegura' : 'Novo anúncio | CompraSegura'}">Anúncio | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}"><script defer th:src="@{/js/anuncio.js}"></script></head><body>
 <header th:replace="~{fragments/conta :: header}"></header><div class="shell"><aside th:replace="~{fragments/conta :: sidebar('anuncios')}"></aside><main id="conteudo">
 <a class="back-link" th:href="@{/minha-conta/anuncios}">← Meus anúncios</a>
-<div class="page-heading"><p class="eyebrow">Comece pelos detalhes</p><h1>Novo anúncio</h1><p>Apresente seu aparelho com informações claras e completas.</p></div>
-<div class="notice">Preencha os dados, anexe a evidência e verifique o aparelho nesta página antes de salvar. A consulta é simulada. Seu anúncio só será criado quando você clicar em Salvar rascunho.</div>
-<form class="card form-card" th:action="@{/minha-conta/anuncios/novo}" th:object="${anuncio}" method="post" enctype="multipart/form-data" id="form-anuncio" th:attr="data-avaliacao-url=@{/minha-conta/anuncios/novo/avaliar}">
+<div class="page-heading"><p class="eyebrow">Comece pelos detalhes</p><h1 th:text="${modoEdicao == true ? 'Editar rascunho' : 'Novo anúncio'}">Novo anúncio</h1><p>Apresente seu aparelho com informações claras e completas.</p></div>
+<div class="notice" th:unless="${modoEdicao == true}">Preencha os dados, anexe a evidência e verifique o aparelho nesta página antes de salvar. A consulta é simulada. Seu anúncio só será criado quando você clicar em Salvar rascunho.</div>
+<div class="notice" th:if="${modoEdicao == true}">Altere os dados e salve quando terminar. Mudanças no aparelho, IMEIs, observações ou imagem deixam a avaliação anterior desatualizada. Título e preço, sozinhos, não alteram a avaliação. <a th:href="@{/minha-conta/anuncios/{id}/editar(id=${anuncioId})}">Reabrir edição</a></div>
+<form class="card form-card" th:action="${modoEdicao == true} ? @{/minha-conta/anuncios/{id}/editar(id=${anuncioId})} : @{/minha-conta/anuncios/novo}" th:object="${anuncio}" method="post" enctype="multipart/form-data" id="form-anuncio" th:attr="data-avaliacao-url=${modoEdicao == true} ? @{/minha-conta/anuncios/{id}/editar/avaliar(id=${anuncioId})} : @{/minha-conta/anuncios/novo/avaliar},data-modo-edicao=${modoEdicao == true}">
+<input th:if="${modoEdicao == true}" type="hidden" th:field="*{versao}">
+<span class="erro-campo" th:if="${modoEdicao == true}" th:errors="*{versao}"></span>
 <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}"><p>Confira os dados abaixo para continuar.</p><p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p></div>
 <fieldset class="form-section"><legend>01. Seu anúncio</legend><div class="campo"><label for="titulo">Título do anúncio</label>
 <input id="titulo" type="text" th:field="*{titulo}" required minlength="5" maxlength="120" aria-describedby="ajuda-titulo erro-titulo" th:attr="aria-invalid=${#fields.hasErrors('titulo')}">
@@ -24,25 +27,33 @@
 <input id="modelo" type="text" th:field="*{modelo}" required maxlength="100" aria-describedby="ajuda-modelo erro-modelo" th:attr="aria-invalid=${#fields.hasErrors('modelo')}">
 <small id="ajuda-modelo"></small><span id="erro-modelo" class="erro-campo" th:errors="*{modelo}"></span></div></div><div class="campo"><label for="condicao">Estado de conservação</label>
 <select id="condicao" th:field="*{condicao}" required aria-describedby="ajuda-condicao erro-condicao" th:attr="aria-invalid=${#fields.hasErrors('condicao')}"><option value="">Selecione o estado</option><option th:each="condicao : ${condicoes}" th:value="${condicao}" th:text="${condicao.descricao}"></option></select>
+<small th:if="${condicaoAnterior != null}" th:text="|Antes: ${condicaoAnterior}. Escolha a opção correspondente; se necessário, preserve os detalhes nas observações.|"></small>
 <small id="ajuda-condicao">Escolha a opção que melhor representa o aparelho.</small><span id="erro-condicao" class="erro-campo" th:errors="*{condicao}"></span></div>
 <div class="campo"><label for="reparos">Reparos e alterações</label>
 <select id="reparos" th:field="*{reparos}" required aria-describedby="ajuda-reparos erro-reparos" th:attr="aria-invalid=${#fields.hasErrors('reparos')}"><option value="">Selecione uma opção</option><option th:each="historico : ${historicosReparos}" th:value="${historico}" th:text="${historico.descricao}"></option></select>
+<small th:if="${reparosAnteriores != null}" th:text="|Antes: ${reparosAnteriores}. Selecione uma opção e registre os detalhes nas observações.|"></small>
 <small id="ajuda-reparos" aria-live="polite" th:attr="hidden=${anuncio.reparos?.name() == 'COM_REPAROS' ? null : 'hidden'}">Informe os reparos e alterações feitos no aparelho no campo OBS (Observações), com pelo menos 20 caracteres.</small>
 <span id="erro-reparos" class="erro-campo" th:errors="*{reparos}"></span></div></fieldset>
+<fieldset class="form-section"><legend>Fotos do aparelho</legend><p>Envie de 1 a 6 fotos do aparelho que você está anunciando. Elas aparecerão na página pública; a primeira será a capa.</p>
+<div class="photo-gallery" th:if="${fotosAtuais != null}"><label class="photo-choice" th:each="foto : ${fotosAtuais}"><img th:src="@{/minha-conta/anuncios/{id}/fotos/{foto}(id=${anuncioId},foto=${foto})}" alt="Foto atual do aparelho"><span><input type="checkbox" name="removerFotos" th:value="${foto}"> Remover esta foto</span></label></div>
+<div class="campo"><label for="fotos">Adicionar fotos do aparelho</label><input id="fotos" name="fotos" type="file" accept="image/png,image/jpeg" multiple th:required="${fotosAtuais == null or #lists.isEmpty(fotosAtuais)}" th:attr="data-existentes=${fotosAtuais == null ? 0 : #lists.size(fotosAtuais)}" aria-describedby="ajuda-fotos"><small id="ajuda-fotos">PNG ou JPEG, até 5 MB por foto. As fotos atuais são mantidas se você não marcar a remoção.</small></div><div id="previa-fotos" class="photo-gallery" aria-live="polite"></div>
+</fieldset>
 <fieldset class="form-section"><legend>03. Identificação</legend><div class="campo"><label for="imeis" class="imei-label"><strong>Todos</strong> os IMEIs do aparelho</label>
 <textarea id="imeis" spellcheck="false" placeholder="12345678-901234-5" th:field="*{imeis}" required maxlength="1000" aria-describedby="ajuda-imeis erro-imeis" th:attr="aria-invalid=${#fields.hasErrors('imeis')}"></textarea>
 <small id="ajuda-imeis">Digite um IMEI por linha, com 15 dígitos; os traços são apenas visuais. Informe <strong>todos</strong> os que aparecem ao discar *#06#.</small><span id="erro-imeis" class="erro-campo" th:errors="*{imeis}"></span></div><p class="muted">A consulta abaixo usa cenários de demonstração; não confirma a regularidade do aparelho.</p></fieldset>
 <fieldset class="form-section"><legend>04. Evidência e verificação</legend>
+<div th:if="${modoEdicao == true and evidencia != null}"><p>Você já enviou uma evidência. Sem selecionar outro arquivo, ela será mantida. Se alterar a identificação do aparelho, confira se a imagem ainda corresponde aos dados.</p><a th:href="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncioId})}" target="_blank" rel="noopener">Ver evidência atual</a></div>
 <div class="campo"><label for="arquivo">Imagem dos IMEIs <span class="muted">(opcional para o rascunho)</span></label>
 <input id="arquivo" name="arquivo" type="file" accept="image/png,image/jpeg" aria-describedby="ajuda-arquivo">
 <small id="ajuda-arquivo">Foto ou captura do *#06# mostrando todos os IMEIs. PNG/JPEG de até 5 MB. O envio da imagem não confirma sua autenticidade.</small></div>
-<p class="notice" th:if="${reselecionarImagem}">Confira os campos e selecione novamente a imagem antes de salvar.</p>
+<p class="notice" th:if="${reselecionarImagem}">Confira os campos e selecione novamente as imagens novas antes de salvar. As fotos já salvas foram mantidas.</p>
 <details class="simulation-examples"><summary>Como testar a simulação</summary><p>Use os números fictícios abaixo, um por linha. Eles servem apenas para demonstração.</p><ul><li><code>000000000000001</code>: sem restrição simulada.</li><li><code>000000000000002</code>: restrição simulada.</li><li><code>000000000000003</code>: resultado inconclusivo.</li><li><code>000000000000004</code>: serviço indisponível.</li></ul><p>Outros números retornam inconclusivo. Nenhum IMEI é enviado a um serviço externo.</p></details>
 <button class="button secondary" type="button" id="verificar-aparelho" hidden>Verificar aparelho — simulação</button>
-<noscript><p>Ative o JavaScript para ver a prévia nesta página. Ao salvar, a avaliação simulada será calculada no servidor e exibida nos detalhes.</p></noscript>
+<noscript><p>Ative o JavaScript para ver a prévia nesta página. Você também pode verificar o aparelho pelos detalhes após salvar.</p></noscript>
+<p class="muted" th:if="${modoEdicao == true}">A prévia abaixo não salva suas alterações. Depois de salvar, use Atualizar avaliação simulada nos detalhes para registrar uma nova avaliação.</p>
 <p id="status-verificacao" class="muted" role="status" aria-live="polite"></p>
 <div id="resultado-verificacao" hidden></div>
 </fieldset>
-<div class="actions"><button class="button" type="submit">Salvar rascunho</button><a th:href="@{/minha-conta/anuncios}">Cancelar</a></div>
+<div class="actions"><button class="button" type="submit" th:text="${modoEdicao == true ? 'Salvar alterações' : 'Salvar rascunho'}">Salvar rascunho</button><a th:href="${modoEdicao == true} ? @{/minha-conta/anuncios/{id}(id=${anuncioId})} : @{/minha-conta/anuncios}">Cancelar</a></div>
 </form></main></div></body></html>
 

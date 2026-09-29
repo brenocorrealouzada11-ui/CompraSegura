@@ -19,8 +19,10 @@ public class AnuncioService {
     private final UsuarioRepository usuarios;
     private final EvidenciaRepository evidencias;
     private final AvaliacaoRepository avaliacoes;
-    public AnuncioService(AnuncioRepository anuncios, UsuarioRepository usuarios, EvidenciaRepository evidencias, AvaliacaoRepository avaliacoes) {
-        this.anuncios = anuncios; this.usuarios = usuarios; this.evidencias = evidencias; this.avaliacoes = avaliacoes;
+    private final CompraSegura.foto.FotoAnuncioRepository fotos;
+    private final java.time.Clock relogio;
+    public AnuncioService(AnuncioRepository anuncios, UsuarioRepository usuarios, EvidenciaRepository evidencias, AvaliacaoRepository avaliacoes, CompraSegura.foto.FotoAnuncioRepository fotos, java.time.Clock relogio) {
+        this.anuncios = anuncios; this.usuarios = usuarios; this.evidencias = evidencias; this.avaliacoes = avaliacoes; this.fotos = fotos; this.relogio = relogio;
     }
 
     @Transactional
@@ -33,22 +35,31 @@ public class AnuncioService {
     }
 
     @Transactional
-    public void excluir(Long id, UsuarioAutenticado principal) {
-        var usuario = usuarios.findById(principal.getId())
+    public String excluir(Long id, UsuarioAutenticado principal) { return excluir(id, principal, null); }
+
+    @Transactional
+    public String excluir(Long id, UsuarioAutenticado principal, Long versao) {
+        // Publicacao e exclusao bloqueiam primeiro o usuario, depois o anuncio.
+        var usuario = usuarios.findParaAtualizacao(principal.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
         if (usuario.getVersaoCredenciais() != principal.getVersaoCredenciais()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         var anuncio = anuncios.findAutorizadoParaAtualizacao(id, principal.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (!"RASCUNHO".equals(anuncio.getStatus())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Somente rascunhos podem ser excluídos por esta ação.");
+        if (versao != null && versao != anuncio.getVersao() || "PUBLICADO".equals(anuncio.getStatus()) && versao == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Reabra a confirmação de exclusão: o anúncio foi alterado.");
         }
+        var agora = java.time.LocalDateTime.now(relogio);
+        usuario.registrarExclusao(anuncio.getPublicadoEm(), agora);
+        String aviso = (anuncio.getPublicadoEm() == null ? "Este rascunho nunca foi publicado e não conta como exclusão rápida. " : "") + usuario.avisoPublicacao(agora);
+        fotos.deleteByAnuncioId(id);
         // Remove tambem a entidade gerenciada; o FK em cascata protege a integridade no banco.
         avaliacoes.deleteByAnuncioId(id);
         evidencias.deleteByAnuncioId(id);
         anuncios.delete(anuncio);
         anuncios.flush();
+        return aviso;
     }
 
     @Transactional(readOnly = true)

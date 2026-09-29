@@ -10,6 +10,7 @@
 <div class="shell"><aside th:replace="~{fragments/conta :: sidebar('perfil')}"></aside>
 <main id="conteudo"><section class="card form-card" aria-labelledby="titulo">
     <p class="eyebrow">Minha conta</p><h1 id="titulo">Editar perfil</h1>
+    <p><a class="button secondary" th:href="@{/minha-conta/foto}">Adicionar ou alterar foto de perfil</a></p>
     <p class="introducao">Atualize seu nome e e-mail. Para mudar o e-mail, confirme sua senha atual. Depois, será necessário entrar novamente.</p>
     <form th:action="@{/minha-conta/editar}" th:object="${perfil}" method="post">
         <div class="aviso-erro" role="alert" th:if="${#fields.hasAnyErrors()}">

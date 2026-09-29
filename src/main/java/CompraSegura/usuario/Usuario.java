@@ -25,6 +25,31 @@ public class Usuario {
     @Column(name = "versao_registro", nullable = false)
     private long versaoRegistro;
 
+    @Column(name = "exclusoes_rapidas", nullable = false)
+    private int exclusoesRapidas;
+    @Column(name = "bloqueado_ate")
+    private java.time.LocalDateTime bloqueadoAte;
+    public int getExclusoesRapidas() { return exclusoesRapidas; }
+    public java.time.LocalDateTime getBloqueadoAte() { return bloqueadoAte; }
+    public boolean publicacaoBloqueada(java.time.LocalDateTime agora) { return bloqueadoAte != null && agora.isBefore(bloqueadoAte); }
+    public void expirarBloqueio(java.time.LocalDateTime agora) {
+        if (bloqueadoAte != null && !agora.isBefore(bloqueadoAte)) { bloqueadoAte = null; exclusoesRapidas = 0; }
+    }
+    public void registrarExclusao(java.time.LocalDateTime publicadoEm, java.time.LocalDateTime agora) {
+        agora = agora.withNano(0); // Mesma precisao de segundos usada no banco.
+        expirarBloqueio(agora);
+        // Um rascunho nunca publicado nao aumenta nem apaga a sequencia.
+        if (publicadoEm == null || publicacaoBloqueada(agora)) return;
+        boolean rapida = !agora.isBefore(publicadoEm) && !agora.isAfter(publicadoEm.plusMinutes(5));
+        exclusoesRapidas = rapida ? exclusoesRapidas + 1 : 0;
+        if (exclusoesRapidas >= 3) bloqueadoAte = agora.plusHours(24).withNano(0);
+    }
+    public String avisoPublicacao(java.time.LocalDateTime agora) {
+        if (publicacaoBloqueada(agora)) return "Novas publicações estão bloqueadas até " + bloqueadoAte.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm")) + ". Você pode continuar editando rascunhos e excluindo anúncios.";
+        int quantidade = bloqueadoAte != null ? 0 : exclusoesRapidas;
+        return "Exclusões rápidas consecutivas: " + quantidade + "/2 permitidas. Excluir até 5 minutos após publicar conta como exclusão rápida. Na terceira seguida, novas publicações ficam bloqueadas por 24 horas.";
+    }
+
     protected Usuario() { }
 
     public Usuario(String nome, String email, String senhaHash) {

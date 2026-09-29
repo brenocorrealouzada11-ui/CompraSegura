@@ -25,6 +25,27 @@ public class Anuncio {
     private String status = "RASCUNHO";
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm = LocalDateTime.now();
+    @Version
+    private long versao;
+    @Column(name = "atualizado_em")
+    private LocalDateTime atualizadoEm;
+    @Column(name = "publicado_em")
+    private LocalDateTime publicadoEm;
+    public LocalDateTime getPublicadoEm() { return publicadoEm; }
+    public Usuario getVendedor() { return vendedor; }
+    public void publicar(java.time.LocalDateTime agora) {
+        status = "PUBLICADO";
+        // A coluna TIMESTAMP guarda segundos; evita o MySQL arredondar para o futuro.
+        publicadoEm = agora.withNano(0);
+        registrarAtualizacao();
+    }
+    public void retirar() { status = "RASCUNHO"; registrarAtualizacao(); }
+    public long getVersao() { return versao; }
+    public void registrarAtualizacao() { atualizadoEm = LocalDateTime.now(); }
+    public void atualizar(String titulo, String descricao, BigDecimal preco) {
+        this.titulo = titulo; this.descricao = descricao; this.preco = preco;
+        registrarAtualizacao();
+    }
     protected Anuncio() { }
     public Anuncio(Usuario vendedor, Aparelho aparelho, String titulo, String descricao, BigDecimal preco) {
         this.vendedor = vendedor; this.aparelho = aparelho; this.titulo = titulo; this.descricao = descricao; this.preco = preco;

@@ -71,6 +71,12 @@
     const resultado = document.getElementById('resultado-verificacao');
     const status = document.getElementById('status-verificacao');
     if (!form || !botao || !resultado || !status) return;
+    function dadosPrevia(form) {
+        const dados = new FormData(form);
+        // As fotos do produto nao participam da consulta de IMEI.
+        dados.delete('fotos'); dados.delete('removerFotos');
+        return dados;
+    }
     let revisao = 0;
     let houvePrevia = false;
     botao.hidden = false;
@@ -89,7 +95,7 @@
         resultado.hidden = true;
         status.textContent = 'Consultando os cenários simulados e avaliando as pendências…';
         try {
-            const resposta = await fetch(form.dataset.avaliacaoUrl, {method: 'POST', body: new FormData(form), credentials: 'same-origin'});
+            const resposta = await fetch(form.dataset.avaliacaoUrl, {method: 'POST', body: dadosPrevia(form), credentials: 'same-origin'});
             if (versaoEnviada !== revisao) return;
             if (resposta.redirected || resposta.status === 401 || resposta.status === 403) {
                 status.textContent = 'Sua sessão expirou. Entre novamente para verificar o aparelho.';
@@ -104,9 +110,34 @@
             if (versaoEnviada !== revisao) return;
             resultado.innerHTML = html;
             resultado.hidden = false;
-            status.textContent = resposta.ok ? 'Prévia concluída. Nenhum anúncio foi salvo. Você pode revisar os dados ou salvar o rascunho.' : 'Corrija os dados indicados abaixo.';
+            status.textContent = resposta.ok ? (form.dataset.modoEdicao === 'true' ? 'Prévia concluída. Suas alterações ainda não foram salvas.' : 'Prévia concluída. Nenhum anúncio foi salvo. Você pode revisar os dados ou salvar o rascunho.') : 'Corrija os dados indicados abaixo.';
         } catch (erro) {
             if (versaoEnviada === revisao) status.textContent = 'Não foi possível verificar agora. Seus dados continuam no formulário; tente novamente.';
         } finally { botao.disabled = false; }
     });
+})();
+
+(() => {
+    const campo = document.getElementById('fotos');
+    const previa = document.getElementById('previa-fotos');
+    if (!campo || !previa) return;
+    let urls = [];
+    function validar() {
+        const removidas = document.querySelectorAll('input[name="removerFotos"]:checked').length;
+        const mantidas = Number(campo.dataset.existentes) - removidas;
+        campo.required = mantidas < 1;
+        const total = mantidas + campo.files.length;
+        campo.setCustomValidity(total > 6 ? 'Escolha no máximo 6 fotos no total.' : [...campo.files].some(f => f.size > 5 * 1024 * 1024) ? 'Cada foto deve ter até 5 MB.' : '');
+    }
+    campo.addEventListener('change', () => {
+        urls.forEach(URL.revokeObjectURL); urls = []; previa.replaceChildren();
+        for (const arquivo of [...campo.files].slice(0, 6)) {
+            if (!['image/png', 'image/jpeg'].includes(arquivo.type) || arquivo.size > 5 * 1024 * 1024) continue;
+            const url = URL.createObjectURL(arquivo); urls.push(url);
+            const img = document.createElement('img'); img.src = url; img.alt = 'Prévia da nova foto do aparelho'; previa.append(img);
+        }
+        validar();
+    });
+    document.querySelectorAll('input[name="removerFotos"]').forEach(c => c.addEventListener('change', validar));
+    validar();
 })();

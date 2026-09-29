@@ -598,3 +598,13 @@ p {
 .simulation-examples summary { cursor: pointer; font-weight: 600; margin-bottom: 12px; }
 .button[hidden], #resultado-verificacao[hidden] { display: none; }
 .button:disabled { cursor: wait; opacity: .65; }
+
+.photo-gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; margin:16px 0 24px; }
+.photo-gallery img { width:100%; height:180px; object-fit:contain; background:#edf2ef; border-radius:12px; display:block; }
+.photo-choice { display:flex; flex-direction:column; gap:8px; font-size:14px; }
+.photo-choice input { width:auto; }
+.profile-photo { object-fit:cover; border-radius:50%; }
+.profile-preview { width:140px; height:140px; display:block; margin:20px 0; }
+.seller-identity { display:flex; align-items:center; gap:10px; min-width:0; }
+.seller-avatar { width:42px; height:42px; object-fit:cover; border-radius:50%; flex-shrink:0; }
+.seller-identity h1,.seller-identity h2 { margin:0; }

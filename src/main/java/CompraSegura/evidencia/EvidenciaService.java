@@ -51,6 +51,7 @@ public class EvidenciaService {
         var evidencia = evidencias.findByAnuncioIdAndAnuncioVendedorId(anuncioId, principal.getId()).orElse(null);
         if (evidencia == null) evidencia = new EvidenciaIMEI(anuncio, imagem);
         else evidencia.atualizar(imagem);
+        anuncio.registrarAtualizacao();
         evidencias.saveAndFlush(evidencia);
         avaliacoes.findByAnuncioIdAndAtualTrue(anuncioId).forEach(RegistroAvaliacao::desatualizar);
     }

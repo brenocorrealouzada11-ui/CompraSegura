@@ -27,6 +27,11 @@ public class Aparelho {
         this.tipo = tipo; this.modelo = modelo; this.condicao = condicao; this.alteracoes = alteracoes;
         numeros.forEach(numero -> this.imeis.add(new IMEI(numero)));
     }
+    public void atualizar(TipoAparelho tipo, ModeloAparelho modelo, String condicao, String alteracoes) {
+        this.tipo = tipo; this.modelo = modelo; this.condicao = condicao; this.alteracoes = alteracoes;
+    }
+    public void limparImeis() { imeis.clear(); }
+    public void adicionarImeis(List<String> numeros) { numeros.forEach(n -> imeis.add(new IMEI(n))); }
     public Long getId() { return id; }
     public TipoAparelho getTipo() { return tipo; }
     public ModeloAparelho getModelo() { return modelo; }

@@ -4,7 +4,7 @@ Plataforma web acadêmica para apoiar a compra e venda de smartphones e tablets 
 
 O **IMEI é o principal fator da avaliação de risco**, complementado pelas informações do aparelho e pelo histórico do vendedor. A plataforma busca dar transparência à decisão de compra; a avaliação não representa garantia de procedência ou de funcionamento.
 
-> **Em desenvolvimento:** página inicial, cadastro, login, sessão, edição de perfil, alteração de senha e logout estão implementados. A área Minha conta tem navegação própria, acesso destacado à troca de senha e cadastro de anúncios como rascunhos privados, com vários IMEIs por aparelho. O envio privado de evidência está implementado. O cadastro permite prévia de consultas simuladas e avaliação qualitativa antes de salvar. Conferência da evidência, integração real e publicação continuam pendentes.
+> **Em desenvolvimento:** página inicial, cadastro, login, sessão, edição de perfil, alteração de senha e logout estão implementados. A área Minha conta tem navegação própria, acesso destacado à troca de senha e cadastro de anúncios como rascunhos privados, com vários IMEIs por aparelho. O envio privado de evidência está implementado. O cadastro permite prévia de consultas simuladas e avaliação qualitativa antes de salvar. Publicação voluntária, pesquisa com filtros, detalhes públicos e atividade pública do vendedor estão implementados. Conferência da evidência, integração real e histórico de compras continuam pendentes.
 
 ## Objetivo e escopo
 
@@ -156,16 +156,44 @@ SELECT id, nome, email FROM comprasegura.usuarios;
 
 Em **Minha conta → Novo anúncio**, informe título, preço, tipo, marca, modelo e todos os IMEIs. Conservação e histórico de reparos são selecionados em listas; observações são opcionais, exceto ao selecionar **Já passou por reparos ou alterações**: nesse caso, descreva os reparos com no mínimo 20 caracteres. A regra é aplicada na interface e no servidor. São aceitos smartphones e tablets com conexão celular. Informe um IMEI por linha; cada identificador deve conter 15 dígitos e não pode se repetir no mesmo aparelho. A interface usa separadores visuais (ex.: `12345678-901234-5`); o banco guarda somente os dígitos. A identificação automática do modelo por IMEI ainda não está implementada.
 
-O anúncio é salvo como **RASCUNHO**, associado à conta autenticada. **Meus anúncios** lista somente os próprios rascunhos, com paginação, e permite abrir seus detalhes. O servidor rejeita acesso aos detalhes de outro usuário. Os IMEIs completos aparecem somente na área privada do proprietário. **Excluir rascunho** está disponível na lista e nos detalhes, abre uma confirmação e remove o anúncio, o aparelho e seus IMEIs. A operação exige sessão do proprietário e CSRF; anúncios que não sejam rascunhos não podem ser excluídos por essa ação. O nome CompraSegura no cabeçalho da conta não possui link; somente **Sair** encerra a sessão.
+O anúncio é salvo como **RASCUNHO**, associado à conta autenticada. **Meus anúncios** lista somente os próprios anúncios, com paginação, e permite abrir seus detalhes. O servidor rejeita acesso aos detalhes de outro usuário. Os IMEIs completos aparecem somente na área privada do proprietário. **Excluir rascunho** está disponível na lista e nos detalhes, abre uma confirmação e remove o anúncio, o aparelho e seus IMEIs. A operação exige sessão do proprietário e CSRF; anúncios publicados também podem ser excluídos, mediante confirmação com a versão atual e aplicação da regra de exclusões rápidas. O nome CompraSegura no cabeçalho da conta não possui link; somente **Sair** encerra a sessão.
 
-A migração V3 cria `aparelhos`, `aparelho_imeis` e `anuncios`. Todos os IMEIs informados são persistidos em ordem. A validação atual confere campos obrigatórios, preço e formato dos identificadores; não confirma a regularidade do aparelho nem se todos os IMEIs físicos foram declarados. A avaliação simulada está disponível no formulário e nos detalhes; não há consulta externa real nem publicação nesta etapa.
+A migração V3 cria `aparelhos`, `aparelho_imeis` e `anuncios`. Todos os IMEIs informados são persistidos em ordem. A validação atual confere campos obrigatórios, preço e formato dos identificadores; não confirma a regularidade do aparelho nem se todos os IMEIs físicos foram declarados. A avaliação simulada está disponível no formulário e nos detalhes; não há consulta externa real nesta etapa. A publicação é uma ação separada e voluntária do vendedor.
+
+### Editar rascunhos
+
+Use **Editar rascunho** na lista ou nos detalhes. O formulário carrega os dados existentes e permite alterar título, preço, observações, aparelho e IMEIs, além de substituir a imagem. Sem novo arquivo, a evidência atual é preservada. A prévia simulada continua disponível na mesma tela e considera a imagem já salva quando não houver substituição.
+
+A edição exige o dono, sessão válida e CSRF e só aceita anúncios em RASCUNHO. A migração V7 adiciona versão e data de atualização, impedindo que uma aba antiga sobrescreva mudanças recentes. Nenhuma migração anterior é alterada.
+
+Alterações em tipo, marca, modelo, conservação, reparos, observações, conjunto de IMEIs ou evidência invalidam a avaliação atual, preservando o histórico. Apenas título, preço ou ordem dos mesmos IMEIs não a invalidam. Após salvar mudanças relevantes, use **Atualizar avaliação simulada** nos detalhes para registrar o novo resultado. A prévia feita durante a edição não substitui esse registro.
+
+### Pesquisa, publicação e histórico do vendedor
+
+Em **Explorar anúncios** (`/anuncios`), visitantes pesquisam por título, marca ou modelo e filtram por tipo, conservação e faixa de preço. Há ordenação por publicação mais recente, menor ou maior preço e paginação de 12 resultados, preservando os filtros. Caracteres como `%` e `_` são tratados como texto, não como curingas.
+
+Rascunhos não aparecem na pesquisa, no perfil público nem na rota pública de detalhes. Nos detalhes privados, **Publicar anúncio** abre uma confirmação com os dados que ficarão visíveis. Somente o dono pode confirmar, com sessão válida, CSRF e versão atual. Para editar um publicado, use **Retirar da pesquisa**: ele volta a rascunho e deixa de ser acessível nas páginas públicas. Publicar não exige aprovação de risco e não transforma resultados simulados em reais. A migração V8 adiciona data de publicação e índices de pesquisa; mantém os rascunhos existentes privados.
+
+Os detalhes públicos (`/anuncios/{id}`) mostram os dados do aparelho, preço, observações, vendedor e a última avaliação, inclusive sua indicação de simulação ou desatualização. Os IMEIs são mascarados também nos motivos e pendências da avaliação. E-mail, credenciais e imagem de evidência não são expostos.
+
+O **Histórico do vendedor** (`/vendedores/{id}`) apresenta o nome, a quantidade de anúncios atualmente publicados e essas publicações em ordem de data. Ainda não existe registro de vendas concluídas, notas, avaliações de compradores ou reputação calculada. Anúncios privados e retirados não entram nesse histórico público. Essa atividade não muda a classificação de risco do aparelho.
+
+### Fotos e exclusão de anúncios publicados
+
+O cadastro exige **1 a 6 fotos do aparelho**, PNG/JPEG de até 5 MB cada. As fotos podem ser mantidas, adicionadas ou removidas na edição, sempre restando pelo menos uma. A primeira foto é a capa da pesquisa. A evidência dos IMEIs é enviada separadamente e continua privada. Fotos dos rascunhos só podem ser lidas pelo dono; as fotos do produto ficam públicas após a publicação e deixam de ser públicas após a retirada ou exclusão. Anúncios antigos sem foto precisam recebê-la antes de uma nova publicação. A interface oferece prévia das imagens selecionadas.
+
+Em **Minha conta → Foto de perfil**, o vendedor pode enviar, substituir ou remover sua foto opcional. Ela aparece junto ao nome no catálogo, nos detalhes e na página do vendedor quando há anúncios publicados. Essa mudança não altera credenciais nem encerra a sessão.
+
+**Excluir anúncio** também está disponível para publicados. Cada exclusão concluída de um anúncio que foi publicado há até **5 minutos, inclusive**, incrementa a sequência de exclusões rápidas da conta. As duas primeiras são permitidas; a terceira é concluída e bloqueia **novas publicações por 24 horas**. A conta pode continuar criando/editando rascunhos e excluindo anúncios. O bloqueio expira automaticamente, reiniciando a contagem. Excluir um anúncio publicado há mais de cinco minutos reinicia a sequência; excluir um rascunho nunca publicado não a altera. Retirar antes de excluir não evita a contagem, pois a data da última publicação é preservada. Outras exclusões durante o bloqueio não prolongam sua duração.
+
+Os avisos aparecem antes da confirmação e após cada publicação e exclusão, com a contagem ou a data e hora de liberação. O controle fica no servidor e persiste no banco; publicação e exclusão bloqueiam a linha da mesma conta para serializar ações simultâneas. A migração V9 adiciona esses campos e as tabelas `fotos_anuncio` e `fotos_perfil`. Todas as imagens são decodificadas e regravadas, removendo metadados e rejeitando arquivos falsos ou acima dos limites. A exclusão remove as fotos associadas ao anúncio, sem apagar a foto de perfil.
 
 ### Próximas etapas
 
 - Conferência da coerência entre evidência, IMEIs e modelo do aparelho.
 - Evolução da avaliação com conferência da evidência e histórico real do vendedor.
-- Publicação, pesquisa, detalhes públicos e histórico do vendedor.
-- Edição de anúncios e gerenciamento dos anúncios publicados com controle de permissão.
+- Registro de compras e avaliações de compradores para evoluir o histórico do vendedor.
+- Evoluir o ciclo dos anúncios com negociação e conclusão de vendas.
 - Integração real de IMEI quando o provedor estiver definido.
 - Refinamento das demais telas e ampliação dos testes.
 
@@ -208,4 +236,4 @@ Consulte [a arquitetura e as regras](docs/consultas-e-confiabilidade.md) para os
 .\mvnw.cmd test
 ```
 
-Os testes usam o perfil `test`, H2 em memória no modo MySQL e as mesmas migrações SQL, sem modificar o banco local. Cobrem cadastro, validações, hash, duplicidade, login, sessão, edição de perfil, senha atual, confirmação da nova senha, encerramento das sessões antigas, isolamento dos usuários, logout e CSRF. Também cobrem a criação dos rascunhos, múltiplos IMEIs, validações, associação ao proprietário, isolamento dos anúncios e escape de conteúdo. H2 não substitui a verificação da aplicação com MySQL real.
+Os testes usam o perfil `test`, H2 em memória no modo MySQL e as mesmas migrações SQL, sem modificar o banco local. Cobrem cadastro, validações, hash, duplicidade, login, sessão, edição de perfil, senha atual, confirmação da nova senha, encerramento das sessões antigas, isolamento dos usuários, logout e CSRF. Também cobrem a criação dos rascunhos, múltiplos IMEIs, validações, associação ao proprietário, isolamento dos anúncios e escape de conteúdo. Os testes do catálogo cobrem publicação e retirada, filtros combinados, ordenação, paginação, isolamento de rascunhos, mascaramento dos IMEIs, escape de HTML e o histórico público. H2 não substitui a verificação da aplicação com MySQL real.

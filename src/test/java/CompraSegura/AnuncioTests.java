@@ -40,8 +40,8 @@ class AnuncioTests {
         return (MockHttpSession) mvc.perform(post("/login").with(csrf()).param("email", email).param("senha", SENHA))
             .andExpect(redirectedUrl("/minha-conta")).andReturn().getRequest().getSession(false);
     }
-    private MockHttpServletRequestBuilder valido(MockHttpSession sessao) {
-        return post("/minha-conta/anuncios/novo").session(sessao).with(csrf())
+    private org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder valido(MockHttpSession sessao) {
+        return multipart("/minha-conta/anuncios/novo").file(TesteFotos.arquivo("fotos")).session(sessao).with(csrf())
             .param("titulo", "  Aparelho de teste  ").param("descricao", "Descricao completa do aparelho")
             .param("preco", "1599.90").param("tipo", "SMARTPHONE").param("marca", "Marca Teste")
             .param("modelo", "Modelo Teste").param("condicao", "COM_MARCAS").param("reparos", "SEM_REPAROS")
@@ -148,7 +148,7 @@ class AnuncioTests {
         assertThat(usuarios.existsById(vendedorId)).isTrue();
         mvc.perform(post(url).session(dono).with(csrf())).andExpect(status().isNotFound());
     }
-    @Test void naoExcluiAnuncioPublicado() throws Exception {
+    @Test void exclusaoPublicadaExigeConfirmacaoAtual() throws Exception {
         var sessao = entrar("vendedor@example.com");
         Long id = criar(sessao);
         jdbc.update("UPDATE anuncios SET status = 'PUBLICADO' WHERE id = ?", id);
