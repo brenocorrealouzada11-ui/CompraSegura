@@ -155,7 +155,9 @@ public class AnuncioController {
 
     @GetMapping("/{id}/excluir")
     String confirmarExclusao(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado principal, Model model) {
-        model.addAttribute("anuncio", service.buscar(id, principal.getId()));
+        var anuncio = service.buscar(id, principal.getId());
+        if (anuncio.isVendido()) return "redirect:/minha-conta/anuncios/" + id;
+        model.addAttribute("anuncio", anuncio);
         model.addAttribute("avisoPublicacao", publicacao.aviso(principal));
         return "excluir-anuncio";
     }

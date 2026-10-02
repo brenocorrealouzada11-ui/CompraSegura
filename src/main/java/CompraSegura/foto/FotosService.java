@@ -30,13 +30,13 @@ public class FotosService {
     }
     @Transactional(readOnly = true)
     public ImagemEvidencia aparelho(Long anuncioId, Long fotoId, Long donoId) {
-        var anuncio = donoId == null ? anuncios.findByIdAndStatus(anuncioId, "PUBLICADO") : anuncios.findByIdAndVendedorId(anuncioId, donoId);
+        var anuncio = donoId == null ? anuncios.findByIdAndStatusIn(anuncioId, java.util.List.of("PUBLICADO", "VENDIDO")) : anuncios.findByIdAndVendedorId(anuncioId, donoId);
         anuncio.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return fotos.findByIdAndAnuncioId(fotoId, anuncioId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).imagem();
     }
     @Transactional(readOnly = true)
     public ImagemEvidencia perfil(Long id, boolean privado) {
-        if (!privado && !anuncios.existsByVendedorIdAndStatus(id, "PUBLICADO")) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!privado && !anuncios.existsByVendedorIdAndStatusIn(id, java.util.List.of("PUBLICADO", "VENDIDO"))) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return perfis.findByUsuarioId(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).imagem();
     }
 }

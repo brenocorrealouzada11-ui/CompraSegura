@@ -31,6 +31,15 @@ public class Anuncio {
     private LocalDateTime atualizadoEm;
     @Column(name = "publicado_em")
     private LocalDateTime publicadoEm;
+    @Column(name = "vendido_em")
+    private LocalDateTime vendidoEm;
+    public LocalDateTime getVendidoEm() { return vendidoEm; }
+    public void marcarVendido(LocalDateTime agora) {
+        if (!"PUBLICADO".equals(status)) throw new IllegalStateException("Somente anúncios publicados podem ser vendidos.");
+        status = "VENDIDO";
+        vendidoEm = agora.withNano(0);
+        atualizadoEm = vendidoEm;
+    }
     public LocalDateTime getPublicadoEm() { return publicadoEm; }
     public Usuario getVendedor() { return vendedor; }
     public void publicar(java.time.LocalDateTime agora) {

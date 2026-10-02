@@ -50,6 +50,7 @@ public class AnuncioService {
         if (versao != null && versao != anuncio.getVersao() || "PUBLICADO".equals(anuncio.getStatus()) && versao == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Reabra a confirmação de exclusão: o anúncio foi alterado.");
         }
+        if ("VENDIDO".equals(anuncio.getStatus())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Anúncios vendidos são preservados no histórico.");
         var agora = java.time.LocalDateTime.now(relogio);
         usuario.registrarExclusao(anuncio.getPublicadoEm(), agora);
         String aviso = (anuncio.getPublicadoEm() == null ? "Este rascunho nunca foi publicado e não conta como exclusão rápida. " : "") + usuario.avisoPublicacao(agora);

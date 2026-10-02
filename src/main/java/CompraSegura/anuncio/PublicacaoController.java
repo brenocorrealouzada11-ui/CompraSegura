@@ -16,7 +16,7 @@ public class PublicacaoController {
     @GetMapping("/{id}/publicar")
     String confirmar(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado principal, Model model) {
         var anuncio = anuncios.buscar(id, principal.getId());
-        if (anuncio.isPublicado()) return "redirect:/minha-conta/anuncios/" + id;
+        if (!anuncio.isRascunho()) return "redirect:/minha-conta/anuncios/" + id;
         model.addAttribute("anuncio", anuncio);
         model.addAttribute("avisoPublicacao", publicacao.aviso(principal));
         return "publicar-anuncio";

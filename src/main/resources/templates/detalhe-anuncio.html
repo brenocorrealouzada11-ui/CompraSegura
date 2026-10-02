@@ -4,15 +4,16 @@
     <a class="back-link" th:href="@{/minha-conta/anuncios}">← Meus anúncios</a>
     <div class="success" role="status" th:if="${anuncioEditado}">Alterações salvas com sucesso.</div>
     <div class="notice" th:if="${reavaliacaoNecessaria}">Os dados usados na avaliação foram alterados. Confira a evidência e use Atualizar avaliação simulada abaixo.</div>
-    <div class="actions" th:unless="${anuncio.publicado}"><a class="button secondary" th:href="@{/minha-conta/anuncios/{id}/editar(id=${anuncio.id})}">Editar rascunho</a></div>
+    <div class="actions" th:if="${anuncio.rascunho}"><a class="button secondary" th:href="@{/minha-conta/anuncios/{id}/editar(id=${anuncio.id})}">Editar rascunho</a></div>
     <div class="success" role="status" th:if="${anuncioSalvo}">Rascunho salvo com sucesso.</div>
-    <div class="page-heading"><span class="badge" th:text="${anuncio.publicado ? 'Publicado' : 'Rascunho · não publicado'}"></span><h1 th:text="${anuncio.titulo}"></h1><p th:text="${anuncio.tipo + ' · ' + anuncio.marca + ' ' + anuncio.modelo}"></p></div>
+    <div class="page-heading"><span class="badge" th:text="${anuncio.vendido ? 'Vendido' : anuncio.publicado ? 'Publicado' : 'Rascunho · não publicado'}"></span><h1 th:text="${anuncio.titulo}"></h1><p th:text="${anuncio.tipo + ' · ' + anuncio.marca + ' ' + anuncio.modelo}"></p></div>
     <div class="notice" role="status" th:if="${avisoPublicacao}" th:text="${avisoPublicacao}"></div>
     <div class="success" role="status" th:if="${sucessoPublicacao}" th:text="${sucessoPublicacao}"></div>
     <div class="aviso-erro" role="alert" th:if="${erroPublicacao}" th:text="${erroPublicacao}"></div>
-    <div class="notice" th:unless="${anuncio.publicado}">Este rascunho é visível somente para você. As consultas disponíveis são simuladas e não comprovam a regularidade do aparelho.</div>
-    <div class="card" th:if="${anuncio.publicado}"><h2>Seu anúncio está na pesquisa</h2><p>Para editar os dados ou trocar a imagem, retire o anúncio da pesquisa. Ele voltará a ser um rascunho.</p><div class="actions"><a class="button secondary" th:href="@{/anuncios/{id}(id=${anuncio.id})}">Ver página pública</a><form th:action="@{/minha-conta/anuncios/{id}/retirar(id=${anuncio.id})}" method="post"><input type="hidden" name="versao" th:value="${anuncio.versao}"><button class="button secondary" type="submit">Retirar da pesquisa</button></form></div></div>
+    <div class="notice" th:if="${anuncio.rascunho}">Este rascunho é visível somente para você. As consultas disponíveis são simuladas e não comprovam a regularidade do aparelho.</div>
+    <div class="card" th:if="${anuncio.publicado}"><h2>Seu anúncio está na pesquisa</h2><p>Para editar os dados ou trocar a imagem, retire o anúncio da pesquisa. Ele voltará a ser um rascunho.</p><div class="actions"><a class="button secondary" th:href="@{/anuncios/{id}(id=${anuncio.id})}">Ver página pública</a><form th:action="@{/minha-conta/anuncios/{id}/retirar(id=${anuncio.id})}" method="post"><input type="hidden" name="versao" th:value="${anuncio.versao}"><button class="button secondary" type="submit">Retirar da pesquisa</button></form><a class="button" th:href="@{/minha-conta/anuncios/{id}/vender(id=${anuncio.id})}">Marcar como vendido</a></div></div>
 
+    <section class="card" th:if="${anuncio.vendido}"><h2>Venda registrada</h2><p th:text="|Venda informada por você em ${anuncio.vendaFormatada}.|"></p><p>O anúncio saiu da pesquisa e permanece no seu histórico público. Este registro não pode ser editado, republicado ou excluído. As conversas existentes continuam disponíveis.</p><div class="actions"><a class="button secondary" th:href="@{/anuncios/{id}(id=${anuncio.id})}">Ver registro público</a><a class="button" th:href="@{/minha-conta/mensagens}">Abrir bate-papo</a></div></section>
     <section class="card"><p class="price" th:text="${anuncio.precoFormatado}"></p><h2>Sobre o aparelho</h2><p class="preserve" th:text="${#strings.isEmpty(anuncio.descricao) ? 'Nenhuma observação adicional.' : anuncio.descricao}"></p><dl class="details"><div><dt>Estado de conservação</dt><dd class="preserve" th:text="${anuncio.condicao}"></dd></div><div><dt>Reparos e alterações declarados</dt><dd class="preserve" th:text="${anuncio.alteracoes}"></dd></div></dl><div class="form-footer"><h2>IMEIs cadastrados</h2><p>Apenas o formato de 15 dígitos foi conferido. Isso não comprova a regularidade do aparelho.</p><ul class="imei-list"><li th:each="imei : ${anuncio.imeis}" th:text="${imei}"></li></ul></div></section>
 <section class="card evidence-card"><h2>Fotos do aparelho</h2><div class="photo-gallery"><a th:each="foto : ${fotosAtuais}" th:href="@{/minha-conta/anuncios/{id}/fotos/{foto}(id=${anuncio.id},foto=${foto})}" target="_blank" rel="noopener"><img th:src="@{/minha-conta/anuncios/{id}/fotos/{foto}(id=${anuncio.id},foto=${foto})}" alt="Foto do aparelho" loading="lazy"></a></div><p th:if="${#lists.isEmpty(fotosAtuais)}">Adicione pelo menos uma foto na edição antes de publicar.</p></section>
 <section id="evidencia" class="card evidence-card" aria-labelledby="titulo-evidencia">
@@ -26,8 +27,8 @@
         <a th:href="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncio.id})}" target="_blank" rel="noopener">Abrir imagem em tamanho completo</a>
         <img class="evidence-preview" th:src="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncio.id})}" alt="Evidência dos IMEIs enviada por você" loading="lazy">
     </div>
-    <p class="notice" th:if="${evidencia == null}">Você ainda não enviou a evidência. O rascunho continua salvo.</p>
-    <form th:unless="${anuncio.publicado}" th:action="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncio.id})}" method="post" enctype="multipart/form-data">
+    <p class="notice" th:if="${evidencia == null}">Nenhuma evidência foi enviada para este anúncio.</p>
+    <form th:if="${anuncio.rascunho}" th:action="@{/minha-conta/anuncios/{id}/evidencia(id=${anuncio.id})}" method="post" enctype="multipart/form-data">
         <div class="campo"><label for="arquivo" th:text="${evidencia == null ? 'Escolha a imagem' : 'Substituir a imagem'}"></label>
         <input id="arquivo" name="arquivo" type="file" accept="image/png,image/jpeg" required aria-describedby="ajuda-arquivo">
         <small id="ajuda-arquivo">PNG ou JPEG, até 5 MB. Ao substituir, a imagem anterior é removida após o novo envio ser aceito.</small></div>
@@ -39,8 +40,8 @@
 <div class="success" role="status" th:if="${avaliacaoAtualizada}">Avaliação simulada atualizada.</div>
 <div class="aviso-erro" role="alert" th:if="${erroAvaliacao}" th:text="${erroAvaliacao}"></div>
 <div th:if="${relatorio != null}"><section th:replace="~{fragments/avaliacao :: resultado}"></section></div>
-<div th:if="${relatorio == null}"><h2>Avaliação de confiabilidade</h2><p>Este rascunho ainda não tem avaliação. Você pode fazer a verificação simulada abaixo.</p></div>
-<form th:action="@{/minha-conta/anuncios/{id}/avaliar(id=${anuncio.id})}" method="post"><button class="button secondary" type="submit">Atualizar avaliação simulada</button></form>
-    <div class="actions" th:unless="${anuncio.publicado}"><a class="button" th:href="@{/minha-conta/anuncios/{id}/publicar(id=${anuncio.id})}">Publicar anúncio</a></div>
+<div th:if="${relatorio == null}"><h2>Avaliação de confiabilidade</h2><p>Nenhuma avaliação foi registrada para este anúncio.</p></div>
+<form th:unless="${anuncio.vendido}" th:action="@{/minha-conta/anuncios/{id}/avaliar(id=${anuncio.id})}" method="post"><button class="button secondary" type="submit">Atualizar avaliação simulada</button></form>
+    <div class="actions" th:if="${anuncio.rascunho}"><a class="button" th:href="@{/minha-conta/anuncios/{id}/publicar(id=${anuncio.id})}">Publicar anúncio</a></div>
 </section>
-<div class="actions"><a class="button danger-outline" th:href="@{/minha-conta/anuncios/{id}/excluir(id=${anuncio.id})}" th:text="${anuncio.publicado ? 'Excluir anúncio' : 'Excluir rascunho'}">Excluir anúncio</a></div></main></div></body></html>
+<div class="actions" th:unless="${anuncio.vendido}"><a class="button danger-outline" th:href="@{/minha-conta/anuncios/{id}/excluir(id=${anuncio.id})}" th:text="${anuncio.publicado ? 'Excluir anúncio' : 'Excluir rascunho'}">Excluir anúncio</a></div></main></div></body></html>

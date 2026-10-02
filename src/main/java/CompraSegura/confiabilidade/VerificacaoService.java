@@ -62,6 +62,7 @@ public class VerificacaoService {
     public void reavaliar(Long anuncioId, Long vendedorId) {
         var anuncio = anuncios.findAutorizadoParaAtualizacao(anuncioId, vendedorId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if ("VENDIDO".equals(anuncio.getStatus())) throw new ResponseStatusException(HttpStatus.CONFLICT, "A avaliação do anúncio vendido é preservada.");
         var dados = AnuncioDetalhes.de(anuncio);
         var verificacao = avaliar(dados.imeis(), dados.condicao(), dados.alteracoes(), dados.descricao(), evidencias.resumo(anuncioId, vendedorId).isPresent());
         registrar(anuncioId, vendedorId, verificacao);

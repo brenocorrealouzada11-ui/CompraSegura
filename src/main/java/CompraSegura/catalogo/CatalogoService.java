@@ -51,15 +51,16 @@ public class CatalogoService {
     }
     public record Detalhes(AnuncioPublico anuncio, RelatorioPublico relatorio) { }
     public Detalhes detalhes(Long id) {
-        var anuncio = anuncios.findByIdAndStatus(id, "PUBLICADO").orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        var anuncio = anuncios.findByIdAndStatusIn(id, List.of("PUBLICADO", "VENDIDO")).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return new Detalhes(publico(anuncio), RelatorioPublico.de(verificacoes.ultimo(id, anuncio.getVendedor().getId())));
     }
-    public record Historico(Long id, String nome, boolean fotoPerfil, Page<AnuncioPublico> anuncios) { }
+    public record Historico(Long id, String nome, boolean fotoPerfil, Page<AnuncioPublico> anuncios, long disponiveis, long vendidos) { }
     public Historico vendedor(Long id, int pagina) {
         Specification<Anuncio> doVendedor = (r, q, cb) -> cb.equal(r.get("vendedor").get("id"), id);
-        var lista = anuncios.findAll(publicados().and(doVendedor), PageRequest.of(Math.max(0, Math.min(pagina, 10000)), 12, ordem(FiltroPesquisa.Ordem.RECENTES)));
+        Specification<Anuncio> visiveis = (r, q, cb) -> r.get("status").in("PUBLICADO", "VENDIDO");
+        var lista = anuncios.findAll(visiveis.and(doVendedor), PageRequest.of(Math.max(0, Math.min(pagina, 10000)), 12, ordem(FiltroPesquisa.Ordem.RECENTES)));
         if (lista.getTotalElements() == 0) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         var usuario = usuarios.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return new Historico(id, usuario.getNome(), perfis.existsByUsuarioId(id), lista.map(this::publico));
+        return new Historico(id, usuario.getNome(), perfis.existsByUsuarioId(id), lista.map(this::publico), anuncios.countByVendedorIdAndStatus(id, "PUBLICADO"), anuncios.countByVendedorIdAndStatus(id, "VENDIDO"));
     }
 }

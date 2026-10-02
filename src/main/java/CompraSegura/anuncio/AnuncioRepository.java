@@ -21,6 +21,10 @@ public interface AnuncioRepository extends JpaRepository<Anuncio, Long>, org.spr
     @org.springframework.data.jpa.repository.Query("select a from Anuncio a where a.id = :id and a.vendedor.id = :vendedorId")
     Optional<Anuncio> findAutorizadoParaAtualizacao(Long id, Long vendedorId);
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"aparelho", "vendedor"})
+    Optional<Anuncio> findByIdAndStatusIn(Long id, java.util.Collection<String> status);
+    boolean existsByVendedorIdAndStatusIn(Long vendedorId, java.util.Collection<String> status);
+    long countByVendedorIdAndStatus(Long vendedorId, String status);
     boolean existsByVendedorIdAndStatus(Long vendedorId, String status);
     long countByVendedorId(Long vendedorId);
     Page<Anuncio> findByVendedorIdOrderByIdDesc(Long vendedorId, Pageable pagina);

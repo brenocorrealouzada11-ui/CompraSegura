@@ -176,13 +176,13 @@ Rascunhos não aparecem na pesquisa, no perfil público nem na rota pública de 
 
 Os detalhes públicos (`/anuncios/{id}`) mostram os dados do aparelho, preço, observações, vendedor e a última avaliação, inclusive sua indicação de simulação ou desatualização. Os IMEIs são mascarados também nos motivos e pendências da avaliação. E-mail, credenciais e imagem de evidência não são expostos.
 
-O **Histórico do vendedor** (`/vendedores/{id}`) apresenta o nome, a quantidade de anúncios atualmente publicados e essas publicações em ordem de data. Ainda não existe registro de vendas concluídas, notas, avaliações de compradores ou reputação calculada. Anúncios privados e retirados não entram nesse histórico público. Essa atividade não muda a classificação de risco do aparelho.
+O **Histórico do vendedor** (`/vendedores/{id}`) apresenta o nome, a quantidade de anúncios atualmente publicados e essas publicações em ordem de data. O histórico também inclui vendas informadas pelo vendedor, com data e totais separados de disponíveis e vendidos. Confirmação do comprador, notas e reputação calculada ainda não estão implementadas. Anúncios privados e retirados não entram nesse histórico público. Essa atividade não muda a classificação de risco do aparelho.
 
 ### Fotos e exclusão de anúncios publicados
 
 O cadastro exige **1 a 6 fotos do aparelho**, PNG/JPEG de até 5 MB cada. As fotos podem ser mantidas, adicionadas ou removidas na edição, sempre restando pelo menos uma. A primeira foto é a capa da pesquisa. A evidência dos IMEIs é enviada separadamente e continua privada. Fotos dos rascunhos só podem ser lidas pelo dono; as fotos do produto ficam públicas após a publicação e deixam de ser públicas após a retirada ou exclusão. Anúncios antigos sem foto precisam recebê-la antes de uma nova publicação. A interface oferece prévia das imagens selecionadas.
 
-Em **Minha conta → Foto de perfil**, o vendedor pode enviar, substituir ou remover sua foto opcional. Ela aparece junto ao nome no catálogo, nos detalhes e na página do vendedor quando há anúncios publicados. Essa mudança não altera credenciais nem encerra a sessão.
+Em **Minha conta → Foto de perfil**, o vendedor pode enviar, substituir ou remover sua foto opcional. Ela aparece junto ao nome no catálogo, nos detalhes e na página do vendedor quando há anúncios publicados ou vendidos. Essa mudança não altera credenciais nem encerra a sessão.
 
 **Excluir anúncio** também está disponível para publicados. Cada exclusão concluída de um anúncio que foi publicado há até **5 minutos, inclusive**, incrementa a sequência de exclusões rápidas da conta. As duas primeiras são permitidas; a terceira é concluída e bloqueia **novas publicações por 24 horas**. A conta pode continuar criando/editando rascunhos e excluindo anúncios. O bloqueio expira automaticamente, reiniciando a contagem. Excluir um anúncio publicado há mais de cinco minutos reinicia a sequência; excluir um rascunho nunca publicado não a altera. Retirar antes de excluir não evita a contagem, pois a data da última publicação é preservada. Outras exclusões durante o bloqueio não prolongam sua duração.
 
@@ -193,7 +193,7 @@ Os avisos aparecem antes da confirmação e após cada publicação e exclusão,
 - Conferência da coerência entre evidência, IMEIs e modelo do aparelho.
 - Evolução da avaliação com conferência da evidência e histórico real do vendedor.
 - Registro de compras e avaliações de compradores para evoluir o histórico do vendedor.
-- Evoluir o ciclo dos anúncios com negociação e conclusão de vendas.
+- Evoluir a venda informada pelo vendedor com identificação e confirmação do comprador.
 - Integração real de IMEI quando o provedor estiver definido.
 - Refinamento das demais telas e ampliação dos testes.
 
@@ -247,3 +247,11 @@ Os testes `ChatTests` cobrem autorização dos participantes, CSRF, validação 
 ```
 
 Os testes usam o perfil `test`, H2 em memória no modo MySQL e as mesmas migrações SQL, sem modificar o banco local. Cobrem cadastro, validações, hash, duplicidade, login, sessão, edição de perfil, senha atual, confirmação da nova senha, encerramento das sessões antigas, isolamento dos usuários, logout e CSRF. Também cobrem a criação dos rascunhos, múltiplos IMEIs, validações, associação ao proprietário, isolamento dos anúncios e escape de conteúdo. Os testes do catálogo cobrem publicação e retirada, filtros combinados, ordenação, paginação, isolamento de rascunhos, mascaramento dos IMEIs, escape de HTML e o histórico público. H2 não substitui a verificação da aplicação com MySQL real.
+
+## Registro de vendas
+
+Em **Meus anúncios**, use **Marcar como vendido** em um anúncio publicado e confirme na tela seguinte. A migração V11 adiciona a data da venda. Somente o proprietário pode confirmar, com sessão válida, CSRF e versão atual do anúncio. Repetir a confirmação não altera a data nem duplica o registro.
+
+O anúncio vendido sai da pesquisa, mas mantém seus dados e fotos no histórico público do vendedor e na página de detalhes, identificado como **venda informada pelo vendedor**. O histórico mostra os totais de disponíveis e vendidos, inclusive quando não há anúncios disponíveis. O preço mostrado é o preço anunciado, não o valor efetivo da negociação. Rascunhos, evidências e IMEIs completos continuam privados.
+
+Nesta versão, a conclusão é definitiva: não é possível editar, republicar, retirar ou excluir o anúncio vendido. A avaliação existente é preservada e a declaração de venda não melhora a confiabilidade nem altera a contagem de exclusões rápidas ou um bloqueio vigente. Conversas existentes continuam funcionando; novos contatos sobre o anúncio ficam indisponíveis. Confirmação do comprador, pagamentos, entrega e avaliações de compradores ainda não fazem parte deste fluxo.

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Registrar venda | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}"></head><body>
+<header th:replace="~{fragments/conta :: header}"></header><div class="shell"><aside th:replace="~{fragments/conta :: sidebar('anuncios')}"></aside><main id="conteudo">
+<a class="back-link" th:href="@{/minha-conta/anuncios/{id}(id=${anuncio.id})}">← Voltar aos detalhes</a>
+<div class="page-heading"><p class="eyebrow">Negociação concluída</p><h1>Marcar como vendido</h1></div>
+<section class="card"><h2 th:text="${anuncio.titulo}"></h2><p>Confirme somente se a venda deste aparelho foi concluída.</p><ul><li>O anúncio sairá da pesquisa e ficará como <strong>Vendido</strong> no seu histórico público, com a data do registro.</li><li>Os dados e as fotos permanecerão públicos, com a indicação de venda informada por você.</li><li>As conversas existentes serão mantidas. Novos compradores não poderão iniciar conversas sobre este anúncio.</li></ul>
+<p class="notice"><strong>Esta ação não pode ser desfeita nesta versão.</strong> O registro vendido será preservado, sem edição, republicação ou exclusão.</p>
+<p>Esta declaração não confirma pagamento ou entrega e não altera a avaliação de confiabilidade.</p>
+<form th:action="@{/minha-conta/anuncios/{id}/vender(id=${anuncio.id})}" method="post"><input type="hidden" name="versao" th:value="${anuncio.versao}"><div class="actions"><button class="button" type="submit">Confirmar venda</button><a class="button secondary" th:href="@{/minha-conta/anuncios/{id}(id=${anuncio.id})}">Cancelar</a></div></form>
+</section></main></div></body></html>
