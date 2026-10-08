@@ -11,7 +11,11 @@
         <a class="nav-link" th:href="@{/anuncios}">Explorar anúncios</a>
         <a class="nav-link" th:href="@{/minha-conta}" th:attr="aria-current=${ativo == 'conta' ? 'page' : null}">Minha conta</a>
         <a class="nav-link" th:href="@{/minha-conta/anuncios}" th:attr="aria-current=${ativo == 'anuncios' ? 'page' : null}">Meus anúncios</a>
+        <a class="nav-link" th:href="@{/minha-conta/favoritos}" th:attr="aria-current=${ativo == 'favoritos' ? 'page' : null}">Favoritos</a>
+        <a class="nav-link" th:href="@{/minha-conta/negociacoes}" th:attr="aria-current=${ativo == 'negociacoes' ? 'page' : null}">Minhas negociações</a>
         <a class="nav-link" th:href="@{/minha-conta/mensagens}" th:attr="aria-current=${ativo == 'mensagens' ? 'page' : null}">Mensagens <span class="badge" hidden th:attr="data-contador-mensagens=@{/minha-conta/mensagens/nao-lidas}"></span></a>
+        <a class="nav-link" th:href="@{/comparar}">Comparar aparelhos</a>
+        <a class="nav-link" th:href="@{/seguranca}">Central de segurança</a>
         <a class="nav-link" th:href="@{/minha-conta/editar}" th:attr="aria-current=${ativo == 'perfil' ? 'page' : null}">Editar perfil</a>
         <a class="nav-link" th:href="@{/minha-conta/senha}" th:attr="aria-current=${ativo == 'senha' ? 'page' : null}">Alterar senha</a>
     </nav>

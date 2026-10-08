@@ -36,7 +36,7 @@ public class SegurancaConfig {
         // O Spring Security verifica o hash e administra a sessao, mantendo CSRF ativo.
         return http.authorizeHttpRequests(auth -> auth
                     .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/cadastro", "/cadastro/sucesso", "/login", "/error").permitAll()
-                    .requestMatchers(org.springframework.http.HttpMethod.GET, "/anuncios", "/anuncios/*", "/vendedores/*", "/anuncios/*/fotos/*", "/vendedores/*/foto").permitAll()
+                    .requestMatchers(org.springframework.http.HttpMethod.GET, "/comparar", "/seguranca", "/anuncios", "/anuncios/*", "/vendedores", "/vendedores/*", "/anuncios/*/fotos/*", "/vendedores/*/foto").permitAll()
                     .requestMatchers("/minha-conta", "/minha-conta/**").authenticated()
                     .anyRequest().denyAll())
                 .formLogin(form -> form.loginPage("/login")

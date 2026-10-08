@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class CatalogoController {
     private final CatalogoService catalogo;
-    public CatalogoController(CatalogoService catalogo) { this.catalogo = catalogo; }
+    private final CompraSegura.reputacao.AvaliacaoPerfilService avaliacoes;
+    private final CompraSegura.favorito.FavoritoService favoritos;
+    public CatalogoController(CatalogoService catalogo, CompraSegura.reputacao.AvaliacaoPerfilService avaliacoes, CompraSegura.favorito.FavoritoService favoritos) { this.catalogo = catalogo; this.avaliacoes = avaliacoes; this.favoritos = favoritos; }
     @InitBinder("filtro") void campos(WebDataBinder binder) { binder.setAllowedFields("q", "tipo", "condicao", "minimo", "maximo", "ordem", "pagina"); }
     @ModelAttribute("conectado") boolean conectado(@AuthenticationPrincipal UsuarioAutenticado principal) { return principal != null; }
     @GetMapping("/anuncios")
@@ -25,6 +27,7 @@ public class CatalogoController {
                 ? "Um dos filtros tem um valor inválido. Selecione as opções e informe preços numéricos."
                 : erro.getDefaultMessage()).distinct().toList());
         model.addAttribute("pagina", erros.hasErrors() ? Page.empty() : catalogo.pesquisar(filtro));
+        model.addAttribute("comparacaoAtiva", true);
         return "pesquisa-anuncios";
     }
     @GetMapping("/anuncios/{id}")
@@ -32,12 +35,16 @@ public class CatalogoController {
         var detalhes = catalogo.detalhes(id);
         model.addAttribute("anuncio", detalhes.anuncio()); model.addAttribute("relatorio", detalhes.relatorio());
         model.addAttribute("proprioAnuncio", principal != null && principal.getId().equals(detalhes.anuncio().vendedorId()));
+        model.addAttribute("favoritado", favoritos.salvo(id, principal));
         return "anuncio-publico";
     }
     @GetMapping("/vendedores/{id}")
-    String vendedor(@PathVariable Long id, @RequestParam(defaultValue = "0") int pagina, Model model) {
+    String vendedor(@PathVariable Long id, @RequestParam(defaultValue = "0") int pagina, @RequestParam(defaultValue = "0") int paginaAvaliacoes, @AuthenticationPrincipal UsuarioAutenticado principal, Model model) {
         var vendedor = catalogo.vendedor(id, pagina);
         model.addAttribute("vendedor", vendedor); model.addAttribute("pagina", vendedor.anuncios());
+        var perfil = avaliacoes.perfil(id, principal, paginaAvaliacoes);
+        model.addAttribute("avaliacoesPerfil", perfil);
+        if (!model.containsAttribute("avaliacaoPerfil")) model.addAttribute("avaliacaoPerfil", perfil.formulario());
         return "historico-vendedor";
     }
 }

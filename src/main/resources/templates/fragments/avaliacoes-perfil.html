@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><body>
+<section id="avaliacoes" class="card profile-reviews" th:fragment="avaliacoes">
+<div class="section-heading"><h2>Avaliações do perfil</h2><span class="badge" th:if="${avaliacoesPerfil.resumo.total > 0}" th:text="|★ ${avaliacoesPerfil.resumo.media}/5 · ${avaliacoesPerfil.resumo.total} avaliação(ões)|"></span></div>
+<p class="muted">Opiniões de pessoas que trocaram mensagens com este vendedor. A conversa não comprova uma compra; estas notas não alteram a avaliação dos IMEIs.</p>
+<div class="success" role="status" th:if="${sucessoAvaliacaoPerfil}" th:text="${sucessoAvaliacaoPerfil}"></div>
+<div class="aviso-erro" role="alert" th:if="${errosAvaliacaoPerfil}"><p th:each="erro : ${errosAvaliacaoPerfil}" th:text="${erro}"></p></div>
+<div class="review-form" th:if="${avaliacoesPerfil.podeAvaliar}"><h3 th:text="${avaliacoesPerfil.existente ? 'Editar sua avaliação' : 'Avaliar este vendedor'}"></h3>
+<form th:action="@{/minha-conta/vendedores/{id}/avaliacao(id=${vendedor.id})}" method="post" th:object="${avaliacaoPerfil}">
+<fieldset class="rating-options"><legend>Sua nota</legend><label th:each="n : ${#numbers.sequence(1,5)}"><input type="radio" th:field="*{nota}" th:value="${n}" required><span th:text="|${n} ★|"></span></label></fieldset>
+<div class="campo"><label for="comentario-perfil">Comentário (opcional)</label><textarea id="comentario-perfil" th:field="*{comentario}" maxlength="1000" rows="3" aria-describedby="ajuda-avaliacao"></textarea><small id="ajuda-avaliacao">Até 1.000 caracteres. Seu nome, sua nota e seu comentário serão públicos. Não inclua dados pessoais ou trechos privados da conversa.</small></div>
+<button class="button" type="submit" th:text="${avaliacoesPerfil.existente ? 'Salvar alterações' : 'Publicar avaliação'}"></button></form>
+<form class="actions" th:if="${avaliacoesPerfil.existente}" th:action="@{/minha-conta/vendedores/{id}/avaliacao/remover(id=${vendedor.id})}" method="post"><button class="button danger-outline" type="submit">Remover minha avaliação</button></form></div>
+<p th:unless="${conectado}"><a th:href="@{/login}">Entre na sua conta</a> para avaliar após trocar mensagens com o vendedor.</p>
+<p class="muted" th:if="${avaliacoesPerfil.propria}">Você não pode avaliar o próprio perfil.</p>
+<p class="muted" th:if="${conectado and !avaliacoesPerfil.propria and !avaliacoesPerfil.podeAvaliar}">Para avaliar, você precisa enviar e receber mensagens deste vendedor na mesma conversa sobre um anúncio.</p>
+<p class="muted" th:if="${avaliacoesPerfil.resumo.total == 0}">Este vendedor ainda não recebeu avaliações.</p>
+<article class="profile-review" th:each="item : ${avaliacoesPerfil.itens.content}"><div class="review-heading"><strong th:text="${item.autor}"></strong><span th:text="|${item.nota}/5 ★|"></span></div><p class="preserve" th:if="${!#strings.isEmpty(item.comentario)}" th:text="${item.comentario}"></p><small class="muted" th:text="|Atualizada em ${item.data}|"></small></article>
+<nav class="pagination" aria-label="Páginas de avaliações" th:if="${avaliacoesPerfil.itens.totalPages > 1}"><a th:if="${avaliacoesPerfil.itens.hasPrevious()}" th:href="@{/vendedores/{id}(id=${vendedor.id},pagina=${pagina.number},paginaAvaliacoes=${avaliacoesPerfil.itens.number - 1})} + '#avaliacoes'">← Anterior</a><span th:text="|Página ${avaliacoesPerfil.itens.number + 1} de ${avaliacoesPerfil.itens.totalPages}|"></span><a th:if="${avaliacoesPerfil.itens.hasNext()}" th:href="@{/vendedores/{id}(id=${vendedor.id},pagina=${pagina.number},paginaAvaliacoes=${avaliacoesPerfil.itens.number + 1})} + '#avaliacoes'">Próxima →</a></nav>
+</section></body></html>

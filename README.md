@@ -176,7 +176,7 @@ Rascunhos não aparecem na pesquisa, no perfil público nem na rota pública de 
 
 Os detalhes públicos (`/anuncios/{id}`) mostram os dados do aparelho, preço, observações, vendedor e a última avaliação, inclusive sua indicação de simulação ou desatualização. Os IMEIs são mascarados também nos motivos e pendências da avaliação. E-mail, credenciais e imagem de evidência não são expostos.
 
-O **Histórico do vendedor** (`/vendedores/{id}`) apresenta o nome, a quantidade de anúncios atualmente publicados e essas publicações em ordem de data. O histórico também inclui vendas informadas pelo vendedor, com data e totais separados de disponíveis e vendidos. Confirmação do comprador, notas e reputação calculada ainda não estão implementadas. Anúncios privados e retirados não entram nesse histórico público. Essa atividade não muda a classificação de risco do aparelho.
+O **Histórico do vendedor** (`/vendedores/{id}`) apresenta o nome, a quantidade de anúncios atualmente publicados e essas publicações em ordem de data. O histórico também inclui vendas informadas pelo vendedor, com data e totais separados de disponíveis e vendidos. O perfil inclui notas e comentários de pessoas que trocaram mensagens com o vendedor; confirmação de compra e reputação integrada ao risco do aparelho continuam pendentes. Anúncios privados e retirados não entram nesse histórico público. Essa atividade não muda a classificação de risco do aparelho.
 
 ### Fotos e exclusão de anúncios publicados
 
@@ -192,7 +192,7 @@ Os avisos aparecem antes da confirmação e após cada publicação e exclusão,
 
 - Conferência da coerência entre evidência, IMEIs e modelo do aparelho.
 - Evolução da avaliação com conferência da evidência e histórico real do vendedor.
-- Registro de compras e avaliações de compradores para evoluir o histórico do vendedor.
+- Registro de compras confirmadas para distinguir avaliações de compradores verificados.
 - Evoluir a venda informada pelo vendedor com identificação e confirmação do comprador.
 - Integração real de IMEI quando o provedor estiver definido.
 - Refinamento das demais telas e ampliação dos testes.
@@ -254,4 +254,26 @@ Em **Meus anúncios**, use **Marcar como vendido** em um anúncio publicado e co
 
 O anúncio vendido sai da pesquisa, mas mantém seus dados e fotos no histórico público do vendedor e na página de detalhes, identificado como **venda informada pelo vendedor**. O histórico mostra os totais de disponíveis e vendidos, inclusive quando não há anúncios disponíveis. O preço mostrado é o preço anunciado, não o valor efetivo da negociação. Rascunhos, evidências e IMEIs completos continuam privados.
 
-Nesta versão, a conclusão é definitiva: não é possível editar, republicar, retirar ou excluir o anúncio vendido. A avaliação existente é preservada e a declaração de venda não melhora a confiabilidade nem altera a contagem de exclusões rápidas ou um bloqueio vigente. Conversas existentes continuam funcionando; novos contatos sobre o anúncio ficam indisponíveis. Confirmação do comprador, pagamentos, entrega e avaliações de compradores ainda não fazem parte deste fluxo.
+Nesta versão, a conclusão é definitiva: não é possível editar, republicar, retirar ou excluir o anúncio vendido. A avaliação existente é preservada e a declaração de venda não melhora a confiabilidade nem altera a contagem de exclusões rápidas ou um bloqueio vigente. Conversas existentes continuam funcionando; novos contatos sobre o anúncio ficam indisponíveis. Confirmação do comprador, pagamentos e entrega ainda não fazem parte deste fluxo. As avaliações do perfil são opiniões após uma conversa e não comprovam a compra.
+
+## Pesquisa e avaliações dos vendedores
+
+Em **Explorar → Vendedores**, a pesquisa em `/vendedores?nome=...` compara exclusivamente o nome público, por trecho, sem diferenciar maiúsculas de minúsculas. Não pesquisa e-mail, título, marca ou modelo. Resultados únicos, em ordem de nome e ID, são paginados de 12 em 12 e mostram foto, anúncios disponíveis, vendas informadas e média das avaliações. Contas com somente rascunhos não aparecem. Perfis com avaliações recebidas permanecem públicos mesmo quando não há mais anúncios, preservando as opiniões.
+
+A migração V12 cria as avaliações dos perfis. Usuários autenticados que enviaram e receberam mensagens na mesma conversa, como interessados em um anúncio daquele vendedor, podem dar uma nota de 1 a 5 e um comentário opcional de até 1.000 caracteres. Só abrir uma conversa ou enviar uma mensagem sem resposta não habilita a avaliação. Não é possível avaliar a própria conta. Cada usuário tem uma avaliação por vendedor, que pode editar ou remover; repetir um envio não cria avaliações extras. Autor e destinatário são verificados no servidor, com sessão válida e CSRF.
+
+Nome do autor, nota, comentário e data são públicos; e-mails e mensagens privadas não são expostos. A média usa todas as avaliações existentes, e os comentários têm paginação independente de 10 em 10. Essas são opiniões após uma conversa, não avaliações de compras verificadas, e não alteram automaticamente a classificação de confiabilidade do aparelho. Moderação, denúncias e confirmação de compra ficam para uma próxima etapa.
+
+## Favoritos e minhas negociações
+
+Em **Minha conta → Favoritos**, cada usuário guarda anúncios publicados de outros vendedores. O botão está nos detalhes públicos do anúncio. Os favoritos são privados, paginados e sem duplicatas por usuário/anúncio; salvar e remover exigem sessão válida e CSRF. A migração V13 cria a tabela. Favoritar não reserva o aparelho. Um anúncio vendido mantém a indicação de vendido; ao retirar ou excluir o anúncio, o favorito continua removível e mostra somente o título salvo e a indicação de indisponibilidade, sem revelar alterações privadas do rascunho.
+
+Em **Minha conta → Minhas negociações**, as conversas existentes são organizadas por anúncio e contraparte, com filtros de participação (comprando/vendendo) e situação (em andamento, anúncio vendido ou indisponível). Cada comprador tem sua própria conversa com o vendedor. A página mostra a última mensagem, a quantidade de não lidas e o link do chat; abrir a lista não marca mensagens como lidas. O acesso se limita aos participantes. Conversas de anúncios excluídos ou retirados continuam acessíveis e não expõem novos dados privados. O estado vendido reflete a declaração do vendedor sobre o anúncio, não uma compra confirmada daquele participante. Não há pagamentos, entrega ou encerramento manual de negociações nesta versão.
+
+## Comparação de aparelhos e Central de segurança
+
+Em **Explorar** ou **Favoritos**, marque **Comparar aparelho** em dois ou três anúncios e use **Comparar selecionados**. A página `/comparar?ids=1&ids=2` mostra preço anunciado, conservação, reparos, observações, vendedor e resultados por IMEI lado a lado, incluindo simulação, atualização e pendências. Aceita somente anúncios públicos (disponíveis ou vendidos, com sinalização); rascunhos, excluídos e IMEIs completos nunca são expostos. O servidor limita a seleção a dois ou três IDs positivos distintos e trata seleções inválidas ou indisponíveis com uma mensagem na própria página.
+
+Com JavaScript, a seleção é mantida na mesma aba por `sessionStorage`, inclusive ao mudar filtros ou páginas, e pode ser limpa ou ter itens removidos. Sem armazenamento, funciona na página atual. Sem JavaScript, é possível selecionar os anúncios da página e enviar o formulário normalmente. A tabela permite rolagem horizontal no celular e navegação por teclado. Não há ranking automático de “melhor” ou aprovação do aparelho.
+
+A **Central de segurança** (`/seguranca`) é pública, com acesso pelo cabeçalho e pelo menu da conta. Explica conferência do aparelho, todos os IMEIs, limites das consultas simuladas e evidências, avaliações de perfis, vendas informadas e sinais de golpe. Inclui links para Anatel e CERT.br, revisados em 07/10/2026. O conteúdo não anuncia consulta real, processamento de pagamentos ou funções de denúncia ainda inexistentes. Estas duas funcionalidades não exigem migração nova do banco.

@@ -28,3 +28,15 @@
 .public-gallery { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
 .public-gallery img { height:300px; }
 .listing-meta { flex-wrap:wrap; }
+
+.search-tabs { margin:0 0 20px; }
+
+.profile-reviews { margin:28px 0; scroll-margin-top:20px; }
+.review-form { padding:20px; background:#f4f8f5; border-radius:12px; margin:20px 0; }
+.rating-options { display:flex; flex-wrap:wrap; gap:12px; border:0; padding:0; margin:0 0 18px; }
+.rating-options legend { font-weight:600; margin-bottom:8px; }
+.rating-options label { display:flex; align-items:center; gap:6px; border:1px solid var(--line); padding:10px 12px; border-radius:8px; background:white; cursor:pointer; }
+.rating-options input { width:auto; margin:0; }
+.rating-options label:has(input:checked) { background:#dcefe4; border-color:#287b5b; }
+.profile-review { padding:20px 0; border-top:1px solid var(--line); overflow-wrap:anywhere; }
+.review-heading { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }

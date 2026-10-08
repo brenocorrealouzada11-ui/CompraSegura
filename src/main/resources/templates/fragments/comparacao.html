@@ -1,0 +1,6 @@
+<!DOCTYPE html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><body>
+<section class="comparison-picker card" th:fragment="selecao" aria-labelledby="titulo-selecao">
+<h2 id="titulo-selecao">Comparar aparelhos</h2><p id="ajuda-comparacao">Marque dois ou três aparelhos para comparar lado a lado.</p>
+<form id="form-comparacao" th:action="@{/comparar}" method="get"><div data-comparison-inputs></div><ul class="comparison-selected" data-comparison-selected aria-label="Aparelhos selecionados"></ul><div class="actions"><button class="button" type="submit" data-comparison-submit>Comparar selecionados</button><button class="text-button" type="button" data-comparison-clear hidden>Limpar seleção</button><span role="status" aria-live="polite" data-comparison-status></span></div></form>
+<noscript><p>Sem JavaScript, selecione os aparelhos nesta página e clique em Comparar selecionados.</p></noscript>
+</section></body></html>

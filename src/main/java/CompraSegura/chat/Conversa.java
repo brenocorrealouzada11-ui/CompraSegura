@@ -30,6 +30,8 @@ public class Conversa {
     public long lidaAte(Long usuarioId) { return isComprador(usuarioId) ? lidaComprador : lidaVendedor; }
     public String getUltimaPrevia() { return ultimaPrevia; }
     public LocalDateTime getAtualizadaEm() { return atualizadaEm; }
+    public String situacaoNegociacao() { return anuncio == null || "RASCUNHO".equals(anuncio.getStatus()) ? "INDISPONIVEL" : "VENDIDO".equals(anuncio.getStatus()) ? "ANUNCIO_VENDIDO" : "EM_ANDAMENTO"; }
+    public Long anuncioPublico() { return "INDISPONIVEL".equals(situacaoNegociacao()) ? null : anuncio.getId(); }
     public Long anuncioDisponivel() { return anuncio != null && "PUBLICADO".equals(anuncio.getStatus()) ? anuncio.getId() : null; }
     public void registrarMensagem(String texto, LocalDateTime agora) {
         int fim = Math.min(160, texto.length());

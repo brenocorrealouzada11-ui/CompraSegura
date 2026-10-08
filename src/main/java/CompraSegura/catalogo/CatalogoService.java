@@ -59,7 +59,7 @@ public class CatalogoService {
         Specification<Anuncio> doVendedor = (r, q, cb) -> cb.equal(r.get("vendedor").get("id"), id);
         Specification<Anuncio> visiveis = (r, q, cb) -> r.get("status").in("PUBLICADO", "VENDIDO");
         var lista = anuncios.findAll(visiveis.and(doVendedor), PageRequest.of(Math.max(0, Math.min(pagina, 10000)), 12, ordem(FiltroPesquisa.Ordem.RECENTES)));
-        if (lista.getTotalElements() == 0) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!usuarios.perfilPublico(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         var usuario = usuarios.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return new Historico(id, usuario.getNome(), perfis.existsByUsuarioId(id), lista.map(this::publico), anuncios.countByVendedorIdAndStatus(id, "PUBLICADO"), anuncios.countByVendedorIdAndStatus(id, "VENDIDO"));
     }

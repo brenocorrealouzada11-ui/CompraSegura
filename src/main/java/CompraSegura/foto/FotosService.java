@@ -36,7 +36,7 @@ public class FotosService {
     }
     @Transactional(readOnly = true)
     public ImagemEvidencia perfil(Long id, boolean privado) {
-        if (!privado && !anuncios.existsByVendedorIdAndStatusIn(id, java.util.List.of("PUBLICADO", "VENDIDO"))) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!privado && !usuarios.perfilPublico(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return perfis.findByUsuarioId(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).imagem();
     }
 }
