@@ -1,0 +1,104 @@
+/* Revisão visual de Explorar e Seu espaço. Escopo restrito a estas páginas. */
+.design-refresh { --bg:#f5f6f2; --ink:#193c35; --muted:#5e7068; --line:#dce4dc; }
+.design-refresh .topbar { min-height:84px; }
+.design-refresh .top-actions { flex-wrap:wrap; gap:18px; }
+.design-refresh .top-actions > a:not(.button) { text-decoration:none; font-weight:600; font-size:14px; }
+.design-refresh .top-actions > a:hover { text-decoration:underline; }
+.design-refresh .button { min-height:46px; gap:12px; }
+.design-refresh .card { border-radius:16px; }
+.design-refresh .shortcut-icon { display:grid; place-items:center; width:44px; height:44px; border-radius:12px; background:#eaf1e5; color:#255d48; font-size:26px; flex-shrink:0; }
+.design-refresh .shortcut-link { font-size:14px; font-weight:700; color:#086d58; }
+.design-refresh .section-heading { flex-wrap:wrap; }
+.explore-page .catalogo { padding-top:24px; }
+.explore-intro { display:grid; grid-template-columns:minmax(0,1fr) 285px; gap:40px; align-items:center; margin-bottom:24px; }
+.explore-page .catalog-hero { padding:12px 0; }
+.explore-page .catalog-hero h1 { font-size:clamp(30px,3.7vw,46px); letter-spacing:-1.6px; margin:10px 0 16px; }
+.explore-page .catalog-hero h1 span { color:#567763; }
+.explore-page .catalog-hero p:last-child { margin:0; max-width:570px; }
+.safety-shortcut { display:flex; gap:14px; align-items:flex-start; text-decoration:none; color:var(--ink); padding:20px; border-left:1px solid #ceddcd; }
+.safety-shortcut small { display:block; color:var(--muted); margin:6px 0 10px; line-height:1.6; }
+.safety-shortcut:hover .shortcut-link { text-decoration:underline; }
+.explore-page .search-tabs { gap:6px; margin:0 0 16px; }
+.explore-page .search-tabs .button { border-radius:30px; padding:8px 23px; }
+.explore-page .search-panel { padding:24px; margin-bottom:28px; box-shadow:0 5px 20px #193c3506; }
+.explore-page .search-row { margin-bottom:18px; }
+.explore-page .search-row input { background:#f8faf6; min-height:52px; }
+.explore-page .search-row .button { min-height:52px; padding-inline:30px; }
+.explore-page .filter-grid { border-top:1px solid var(--line); padding-top:18px; gap:14px; }
+.explore-page .filter-grid .campo { margin-bottom:12px; min-width:0; }
+.explore-page .search-panel > a { font-size:14px; }
+.explore-page .results-heading { margin-top:0; }
+.explore-page .results-heading p { color:var(--muted); margin:0; font-size:14px; }
+.explore-page .catalog-grid { gap:22px; }
+.explore-page .listing-card { display:flex; flex-direction:column; transition:box-shadow .18s ease,border-color .18s ease; }
+.explore-page .listing-card:hover { border-color:#93b49b; box-shadow:0 8px 24px #183c3610; }
+.explore-page .listing-photo { height:240px; object-fit:contain; padding:14px; background:#edf0e9; }
+.explore-page .device-tile { height:240px; }
+.explore-page .listing-body { flex:1; display:flex; flex-direction:column; padding:20px; }
+.explore-page .listing-body .compare-choice { align-self:flex-start; margin:0 0 16px; padding:6px 10px; border:1px solid var(--line); border-radius:7px; font-size:13px; }
+.explore-page .compare-choice:has(input:checked) { background:#e1f0df; border-color:#559267; }
+.explore-page .listing-body > .badge { align-self:flex-start; }
+.explore-page .listing-body > .eyebrow { margin-bottom:6px; }
+.explore-page .listing-body h2 { font-size:20px; }
+.explore-page .listing-body > p:not(.price):not(.eyebrow) { font-size:14px; }
+.explore-page .price { font-size:28px; margin:18px 0; letter-spacing:-.7px; }
+.explore-page .listing-meta { margin-top:auto; font-size:13px; align-items:center; }
+.explore-page .comparison-picker { background:#edf4e8; border:1px solid #c9dcbf; }
+.explore-page .comparison-picker .actions { margin-top:12px; }
+.account-page .shell { gap:32px; padding-top:32px; }
+.account-page .sidebar { align-self:start; }
+.account-page .sidebar nav { gap:3px; }
+.account-page .sidebar .nav-link { font-size:14px; padding:10px 14px; }
+.account-page .nav-link[aria-current=page] { background:#193c35; color:#fff; }
+.dashboard-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; margin-bottom:26px; }
+.dashboard-heading .page-heading { margin:0; }
+.dashboard-heading > .button { flex-shrink:0; }
+.dashboard-feature { background:#193f35; border-radius:20px; padding:32px; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:36px; align-items:center; color:#fff; }
+.dashboard-feature h2 { font-size:clamp(27px,3vw,36px); letter-spacing:-1px; margin-bottom:16px; }
+.dashboard-feature p { color:#d0e0d4; max-width:440px; }
+.dashboard-feature .eyebrow { color:#c7e7a9; }
+.dashboard-feature .button { color:#163c2e; background:#d1eead; border-color:#d1eead; }
+.dashboard-feature .button:hover { background:#e4f6cf; }
+.draft-note { border-left:1px solid #537565; padding-left:28px; }
+.draft-note > span { display:block; font-size:48px; color:#d1eead; line-height:1; margin-bottom:22px; }
+.draft-note strong { display:block; margin-bottom:8px; }
+.draft-note p { font-size:14px; margin:0; }
+.dashboard-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:24px 0; }
+.shortcut-card { display:flex; flex-direction:column; padding:22px; border:1px solid var(--line); border-radius:16px; background:white; text-decoration:none; color:var(--ink); min-width:0; }
+.shortcut-card:hover { border-color:#85aa8b; background:#fafcf7; }
+.shortcut-card .shortcut-icon { margin-bottom:20px; }
+.shortcut-card h2 { font-size:18px; }
+.shortcut-card p { color:var(--muted); font-size:14px; }
+.shortcut-card .shortcut-link { margin-top:auto; }
+.publication-notice { font-size:13px; line-height:1.7; }
+.account-empty { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.account-empty p { margin:0; }
+.account-empty a { flex-shrink:0; font-size:14px; }
+.account-page .profile-grid .card { display:flex; flex-direction:column; }
+.account-page .profile-grid .actions { margin-top:auto; padding-top:12px; }
+.account-page .profile-grid .identity { margin-bottom:20px; }
+@media(max-width:1100px) { .design-refresh .topbar { flex-wrap:wrap; gap:14px; } .dashboard-shortcuts { gap:12px; } .shortcut-card { padding:18px; } .dashboard-heading { align-items:flex-start; flex-direction:column; } }
+@media(max-width:850px) { .explore-intro { grid-template-columns:1fr; gap:0; } .safety-shortcut { border-left:0; border-top:1px solid var(--line); padding:16px 0 0; } .safety-shortcut small { margin:2px 0; } .account-page .shell { gap:20px; padding-top:16px; } .account-page .sidebar nav { padding:4px 4px 10px; } .dashboard-heading { flex-direction:row; align-items:center; } .account-empty { align-items:flex-start; flex-direction:column; } }
+@media(max-width:600px) { .design-refresh .top-actions { gap:12px; } .design-refresh .topbar { padding:16px; } .explore-page .catalog-hero h1 { letter-spacing:-1px; } .explore-page .catalogo { padding-top:14px; } .explore-page .search-panel { padding:18px; } .explore-page .filter-grid { grid-template-columns:1fr 1fr; } .explore-page .filter-grid .campo:last-child { grid-column:1/-1; } .explore-page .listing-photo { height:230px; } .dashboard-heading { flex-direction:column; align-items:flex-start; } .dashboard-feature { padding:24px; grid-template-columns:1fr; gap:24px; } .draft-note { padding:16px 0 0; border-left:0; border-top:1px solid #537565; } .draft-note > span { display:none; } .dashboard-shortcuts { grid-template-columns:1fr; } .shortcut-card { display:grid; grid-template-columns:44px minmax(0,1fr); column-gap:16px; } .shortcut-card .shortcut-icon { grid-row:1/4; margin:0; } .shortcut-card h2,.shortcut-card p,.shortcut-card .shortcut-link { grid-column:2; } .shortcut-card p { margin-bottom:10px; } .account-page .profile-grid { grid-template-columns:1fr; } .account-page .section-heading > span { font-size:13px; } }
+@media(max-width:380px) { .explore-page .filter-grid { grid-template-columns:1fr; } }
+@media(prefers-reduced-motion:reduce) { .explore-page .listing-card { transition:none; } }
+
+.explore-page .catalog-hero h1 { font-size:clamp(28px,3vw,38px); }
+.explore-page .catalog-hero p:last-child { font-size:15px; }
+.explore-page .explore-intro { margin-bottom:16px; }
+.search-filters { border-top:1px solid var(--line); padding-top:14px; }
+.search-filters summary { cursor:pointer; font-weight:600; font-size:14px; }
+.search-filters summary span { color:var(--muted); font-weight:400; margin-left:12px; }
+.search-filters summary:focus-visible { outline:3px solid #dc9f28; outline-offset:4px; }
+.explore-page .search-filters .filter-grid { border:0; }
+.search-filters > a { font-size:14px; }
+@media(max-width:600px) {
+ .explore-page .search-tabs { flex-wrap:nowrap; }
+ .explore-page .search-tabs .button { width:auto; flex:1; padding-inline:12px; }
+ .explore-page .safety-shortcut { padding-top:12px; gap:10px; }
+ .explore-page .safety-shortcut small { display:none; }
+ .explore-page .safety-shortcut strong { font-size:14px; }
+ .explore-page .safety-shortcut .shortcut-link { display:block; }
+ .explore-page .search-row { gap:12px; }
+ .search-filters summary span { display:block; margin-left:18px; font-size:13px; }
+}

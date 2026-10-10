@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha conta | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}">
-</head><body>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha conta | CompraSegura</title><link rel="stylesheet" th:href="@{/css/conta.css}"><link rel="stylesheet" th:href="@{/css/design-revisao.css}"></head>
+<body class="design-refresh account-page">
 <header th:replace="~{fragments/conta :: header}"></header>
 <div class="shell"><aside th:replace="~{fragments/conta :: sidebar('conta')}"></aside>
 <main id="conteudo">
-    <div class="page-heading"><p class="eyebrow">Tudo em um só lugar</p><h1>Minha conta</h1><p>Cuide do seu perfil e prepare seu próximo anúncio.</p></div>
+    <div class="dashboard-heading"><div class="page-heading"><p class="eyebrow">Minha conta</p><h1>Seu espaço</h1><p>Encontre, negocie e dê uma nova história ao seu aparelho.</p></div><a class="button secondary" th:href="@{/anuncios}">Explorar anúncios <span aria-hidden="true">↗</span></a></div>
     <div class="success" role="status" th:if="${perfilSalvo}">Perfil atualizado com sucesso.</div>
-    <div class="notice" th:text="${avisoPublicacao}"></div>
-    <div class="grid">
-        <section class="card" aria-labelledby="perfil-titulo"><div class="identity"><img th:if="${temFoto}" class="avatar profile-photo" th:src="@{/minha-conta/foto/imagem}" alt="Sua foto de perfil"><span th:unless="${temFoto}" class="avatar" aria-hidden="true" th:text="${inicial}">B</span><div><h2 id="perfil-titulo" th:text="${nome}">Seu nome</h2><p th:text="${email}">Seu e-mail</p></div></div><p>Seus dados pessoais, sempre atualizados.</p><a class="button secondary" th:href="@{/minha-conta/editar}">Editar perfil</a> <a th:href="@{/minha-conta/foto}">Foto de perfil</a></section>
-        <section class="card" aria-labelledby="seguranca-titulo"><h2 id="seguranca-titulo">Segurança da conta</h2><p>Atualize sua senha usando a senha atual para confirmar a mudança.</p><div class="security-mark" aria-hidden="true">••••••••</div><a class="button" th:href="@{/minha-conta/senha}">Alterar senha</a></section>
+    <section class="dashboard-feature" aria-labelledby="novo-anuncio-titulo"><div><p class="eyebrow">Para quem quer vender</p><h2 id="novo-anuncio-titulo">Seu próximo anúncio<br>começa aqui.</h2><p>Fotos, detalhes e IMEIs: prepare tudo no seu tempo e publique quando estiver pronto.</p><a class="button" th:href="@{/minha-conta/anuncios/novo}">+ Novo anúncio</a></div><div class="draft-note"><span aria-hidden="true">↗</span><strong>Do rascunho à negociação</strong><p>Antes de publicar, seu rascunho fica visível somente para você.</p></div></section>
+    <nav class="dashboard-shortcuts" aria-label="Atalhos do seu espaço">
+        <a class="shortcut-card" th:href="@{/minha-conta/anuncios}"><span class="shortcut-icon" aria-hidden="true">▤</span><h2>Meus anúncios <span class="badge" th:text="${totalAnuncios}">0</span></h2><p>Continue seus rascunhos e acompanhe suas publicações.</p><span class="shortcut-link">Gerenciar anúncios →</span></a>
+        <a class="shortcut-card" th:href="@{/minha-conta/favoritos}"><span class="shortcut-icon" aria-hidden="true">♡</span><h2>Favoritos</h2><p>Volte aos aparelhos que chamaram sua atenção.</p><span class="shortcut-link">Ver favoritos →</span></a>
+        <a class="shortcut-card" th:href="@{/minha-conta/negociacoes}"><span class="shortcut-icon" aria-hidden="true">↔</span><h2>Minhas negociações</h2><p>Retome suas conversas como comprador ou vendedor.</p><span class="shortcut-link">Ver negociações →</span></a>
+    </nav>
+    <div class="notice publication-notice" th:text="${avisoPublicacao}"></div>
+    <section class="card account-empty" th:if="${totalAnuncios == 0}"><div><h2>Seu primeiro anúncio começa aqui</h2><p>Você ainda não tem anúncios. Comece pelo aparelho que deseja vender.</p></div><a th:href="@{/minha-conta/anuncios/novo}">Criar meu primeiro anúncio →</a></section>
+    <div class="section-heading"><h2>Perfil e segurança</h2><span class="muted">Sua conta, do seu jeito</span></div>
+    <div class="grid profile-grid">
+        <section class="card" aria-labelledby="perfil-titulo"><div class="identity"><img th:if="${temFoto}" class="avatar profile-photo" th:src="@{/minha-conta/foto/imagem}" alt="Sua foto de perfil"><span th:unless="${temFoto}" class="avatar" aria-hidden="true" th:text="${inicial}">B</span><div><h2 id="perfil-titulo" th:text="${nome}">Seu nome</h2><p th:text="${email}">Seu e-mail</p></div></div><p>Mantenha seus dados e sua foto atualizados.</p><div class="actions"><a class="button secondary" th:href="@{/minha-conta/editar}">Editar perfil</a><a th:href="@{/minha-conta/foto}">Foto de perfil</a></div></section>
+        <section class="card" aria-labelledby="seguranca-titulo"><p class="eyebrow">Acesso à conta</p><h2 id="seguranca-titulo">Segurança começa com você.</h2><p>Use uma senha exclusiva. Para alterá-la, confirme sua senha atual.</p><div class="actions"><a class="button secondary" th:href="@{/minha-conta/senha}">Alterar senha</a><a th:href="@{/seguranca}">Central de segurança</a></div></section>
     </div>
-    <div class="grid"><section class="card"><h2>Favoritos</h2><p>Guarde os aparelhos que chamaram sua atenção e acompanhe a disponibilidade.</p><a class="button secondary" th:href="@{/minha-conta/favoritos}">Ver favoritos</a></section><section class="card"><h2>Minhas negociações</h2><p>Acompanhe suas conversas como comprador ou vendedor, organizadas por anúncio.</p><a class="button secondary" th:href="@{/minha-conta/negociacoes}">Ver negociações</a></section></div>
-    <section class="card feature"><div><p class="eyebrow">Pronto para o próximo passo?</p><h2>Seu aparelho tem uma nova história.</h2><p>Cadastre os detalhes e os IMEIs. Seu anúncio fica salvo como rascunho, visível somente para você.</p></div><a class="button" th:href="@{/minha-conta/anuncios/novo}">+ Novo anúncio</a></section>
-    <div class="section-heading"><h2>Seus anúncios <span class="badge" th:text="${totalAnuncios}">0</span></h2><a th:href="@{/minha-conta/anuncios}">Ver todos →</a></div>
-    <section class="card empty" th:if="${totalAnuncios == 0}"><span class="empty-symbol" aria-hidden="true">▤</span><h3>Seu primeiro anúncio começa aqui</h3><p>Você ainda não tem anúncios. Comece pelo aparelho que deseja vender.</p><a th:href="@{/minha-conta/anuncios/novo}">Criar meu primeiro anúncio</a></section>
-    <section class="card" th:if="${totalAnuncios > 0}"><h3>Gerencie seus anúncios</h3><p>Acesse os detalhes dos aparelhos em Meus anúncios.</p><a th:href="@{/minha-conta/anuncios}">Abrir meus anúncios →</a></section>
 </main></div></body></html>
